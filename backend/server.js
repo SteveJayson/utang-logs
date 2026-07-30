@@ -10,7 +10,15 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5000',
+        'http://localhost:8000',
+        'https://utang-logs-frontend.onrender.com',
+        'https://utang-logs.onrender.com'
+    ],
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
