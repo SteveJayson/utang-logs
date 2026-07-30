@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utang Logs - Debt Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Utang Logs</h1>
+            <p>Track your debts and payments</p>
+        </header>
+
+        <!-- Add Borrower Form -->
+        <section class="form-section">
+            <h2>Add New Borrower</h2>
+            <form id="borrowerForm">
+                <div class="form-group">
+                    <input type="text" id="borrowerName" placeholder="Borrower Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="borrowerContact" placeholder="Contact Info (optional)">
+                </div>
+                <button type="submit">Add Borrower</button>
+            </form>
+        </section>
+
+        <!-- Add Debt Form -->
+        <section class="form-section">
+            <h2>Log New Debt</h2>
+            <form id="debtForm">
+                <div class="form-group">
+                    <select id="debtBorrower" required>
+                        <option value="">Select Borrower</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="debtAmount" placeholder="Amount (₱)" required step="0.01">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="debtReason" placeholder="Reason/Item" required>
+                </div>
+                <div class="form-group">
+                    <input type="date" id="debtDate">
+                </div>
+                <button type="submit">Log Debt</button>
+            </form>
+        </section>
+
+        <!-- Record Payment Form -->
+        <section class="form-section">
+            <h2>Record Payment</h2>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <select id="paymentBorrower" required>
+                        <option value="">Select Borrower</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="paymentDebt" required>
+                        <option value="">Select Debt</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="paymentAmount" placeholder="Amount Paid (₱)" required step="0.01">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="paymentNotes" placeholder="Notes (optional)">
+                </div>
+                <button type="submit">Record Payment</button>
+            </form>
+        </section>
+
+        <!-- Dashboard/Summary -->
+        <section class="dashboard">
+            <h2>Dashboard</h2>
+            <div id="borrowerList">
+                <p>Loading borrowers...</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
