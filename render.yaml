@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: utang-logs-backend
+    runtime: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+
+  - type: static
+    name: utang-logs-frontend
+    runtime: static
+    buildCommand: echo "No build needed"
+    staticPublishPath: frontend
