@@ -56,14 +56,13 @@ exports.getDebtsByBorrower = async (req, res) => {
     }
 };
 
-// GET single debt by ID - FIXED!
+// Get single debt with full details
 exports.getDebtById = async (req, res) => {
     try {
         const { id } = req.params;
         
         console.log('🔍 Fetching debt with ID:', id);
         
-        // Find the debt
         const debt = await Debt.findById(id);
         
         if (!debt) {
@@ -76,20 +75,8 @@ exports.getDebtById = async (req, res) => {
         
         console.log('✅ Debt found:', debt);
         
-        // Get payments for this debt
         const payments = await Payment.find({ debtId: id });
-        console.log('💰 Payments found:', payments.length);
-        
         const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
-        
-        // Get borrower info
-        let borrowerName = 'Unknown';
-        try {
-            const borrower = await Borrower.findById(debt.borrowerId);
-            if (borrower) borrowerName = borrower.name;
-        } catch (err) {
-            console.log('Could not fetch borrower:', err.message);
-        }
         
         res.json({
             success: true,
@@ -99,7 +86,6 @@ exports.getDebtById = async (req, res) => {
                 reason: debt.reason,
                 status: debt.status || 'Unpaid',
                 dateBorrowed: debt.dateBorrowed,
-                borrowerName: borrowerName,
                 totalPaid: totalPaid,
                 remainingBalance: debt.amount - totalPaid,
                 payments: payments.map(p => ({
@@ -114,7 +100,7 @@ exports.getDebtById = async (req, res) => {
         console.error('❌ Error in getDebtById:', error);
         res.status(500).json({
             success: false,
-            message: 'Server error: ' + error.message
+            message: error.message
         });
     }
 };
@@ -148,6 +134,48 @@ exports.updateDebtStatus = async (req, res) => {
             data: debt
         });
     } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+// ============================================
+// DELETE DEBT - NEW!
+// ============================================
+exports.deleteDebt = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        console.log('🗑️ Deleting debt with ID:', id);
+        
+        // Find the debt
+        const debt = await Debt.findById(id);
+        if (!debt) {
+            console.log('❌ Debt not found');
+            return res.status(404).json({
+                success: false,
+                message: 'Debt not found'
+            });
+        }
+        
+        console.log('📦 Debt found:', debt.reason);
+        
+        // Delete all payments associated with this debt
+        const paymentResult = await Payment.deleteMany({ debtId: id });
+        console.log(`💸 Deleted ${paymentResult.deletedCount} payments`);
+        
+        // Delete the debt
+        await debt.deleteOne();
+        console.log('✅ Debt deleted successfully');
+        
+        res.json({
+            success: true,
+            message: 'Debt and associated payments deleted successfully'
+        });
+    } catch (error) {
+        console.error('❌ Error deleting debt:', error);
         res.status(400).json({
             success: false,
             message: error.message

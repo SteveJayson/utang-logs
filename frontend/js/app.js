@@ -2,7 +2,7 @@
 // UTANG LOGS - Complete Application
 // ========================================
 
-const API_URL = 'https://utang-logs.onrender.com/api';  // ← THIS MUST BE YOUR RENDER URL!
+const API_URL = 'https://utang-logs.onrender.com/api';
 let currentBorrowerId = null;
 
 // ========================================
@@ -10,7 +10,6 @@ let currentBorrowerId = null;
 // ========================================
 
 function showToast(message, type = 'info') {
-    // Remove existing toast
     const existing = document.querySelector('.toast');
     if (existing) existing.remove();
     
@@ -19,7 +18,6 @@ function showToast(message, type = 'info') {
     toast.textContent = message;
     document.body.appendChild(toast);
     
-    // Auto remove after 4 seconds
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(100%)';
@@ -32,7 +30,6 @@ function showToast(message, type = 'info') {
 // ========================================
 
 async function deleteBorrower(borrowerId, borrowerName, hasRemainingBalance) {
-    // Check if there's remaining balance
     if (hasRemainingBalance > 0) {
         const confirmDelete = confirm(
             `⚠️ ${borrowerName} still has remaining balance of ₱${hasRemainingBalance.toFixed(2)}!\n\n` +
@@ -59,9 +56,43 @@ async function deleteBorrower(borrowerId, borrowerName, hasRemainingBalance) {
             throw new Error(error.message || 'Failed to delete borrower');
         }
         
-        // Refresh the dashboard
         await refreshDashboard();
         showToast('✅ Borrower deleted successfully!', 'success');
+    } catch (error) {
+        showToast('❌ Error: ' + error.message, 'error');
+    }
+}
+
+// ========================================
+// DELETE DEBT - NEW!
+// ========================================
+
+async function deleteDebt(debtId, debtReason, debtAmount) {
+    const confirmDelete = confirm(
+        `⚠️ Delete this debt?\n\n` +
+        `Reason: ${debtReason}\n` +
+        `Amount: ₱${debtAmount.toFixed(2)}\n\n` +
+        `This will also delete all payments associated with this debt.\n` +
+        `This action cannot be undone!`
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/debts/${debtId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to delete debt');
+        }
+        
+        await refreshDashboard();
+        showToast('✅ Debt deleted successfully!', 'success');
+        
+        document.getElementById('debtDetailView').style.display = 'none';
+        
     } catch (error) {
         showToast('❌ Error: ' + error.message, 'error');
     }
@@ -72,19 +103,14 @@ async function deleteBorrower(borrowerId, borrowerName, hasRemainingBalance) {
 // ========================================
 
 function showSection(sectionId) {
-    // Hide all sections
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    
-    // Show selected section
     const section = document.getElementById('section' + sectionId.charAt(0).toUpperCase() + sectionId.slice(1));
     if (section) section.classList.add('active');
     
-    // Update nav buttons
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     const navBtn = document.getElementById('nav' + sectionId.charAt(0).toUpperCase() + sectionId.slice(1));
     if (navBtn) navBtn.classList.add('active');
     
-    // Hide debt detail if showing
     document.getElementById('debtDetailView').style.display = 'none';
 }
 
@@ -293,8 +319,8 @@ async function showBorrowerDebts(borrowerId) {
     let debtsHtml = '';
     if (debts && debts.length > 0) {
         debtsHtml = debts.map(debt => `
-            <div class="debt-item" onclick="showDebtPayments('${debt._id}')">
-                <div class="debt-info">
+            <div class="debt-item">
+                <div class="debt-info" onclick="showDebtPayments('${debt._id}')" style="flex:1;cursor:pointer;">
                     <span class="reason">${debt.reason}</span>
                     <span class="date">📅 ${formatDate(debt.dateBorrowed)}</span>
                 </div>
@@ -305,6 +331,11 @@ async function showBorrowerDebts(borrowerId) {
                     </span>
                 </div>
                 <span class="debt-status status-${debt.status.toLowerCase()}">${debt.status}</span>
+                <button onclick="event.stopPropagation(); deleteDebt('${debt._id}', '${debt.reason}', ${debt.amount})" 
+                        class="btn-delete-debt"
+                        title="Delete this debt">
+                    🗑️
+                </button>
             </div>
         `).join('');
     } else {
@@ -330,7 +361,7 @@ async function showBorrowerDebts(borrowerId) {
             ${debtsHtml}
         </div>
         <div class="click-hint" style="margin-top:15px;text-align:center;color:var(--gray-400);font-size:0.85rem;">
-            👆 Click a debt to view payments
+            👆 Click a debt to view payments | 🗑️ Click trash to delete
         </div>
     `;
     
@@ -357,7 +388,6 @@ async function showDebtPayments(debtId) {
         
         const content = document.getElementById('debtDetailContent');
         
-        // Build payments HTML
         let paymentsHtml = '';
         if (debtData.payments && debtData.payments.length > 0) {
             paymentsHtml = debtData.payments.map(p => `
@@ -400,7 +430,6 @@ async function showDebtPayments(debtId) {
             ${paymentsHtml}
         `;
         
-        // Find the debt list and insert before it
         const debtList = content.querySelector('.debt-list');
         if (debtList) {
             const existingDetail = content.querySelector('.debt-payment-detail');
@@ -449,7 +478,6 @@ async function populateSelects() {
         if (currentValue) select.value = currentValue;
     });
     
-    // Payment debt dropdown
     document.getElementById('paymentBorrower').addEventListener('change', async function() {
         const debtSelect = document.getElementById('paymentDebt');
         const borrowerId = this.value;
@@ -499,7 +527,6 @@ async function refreshDashboard() {
 // EVENT LISTENERS
 // ========================================
 
-// Borrower Form 1 (Dashboard)
 document.getElementById('borrowerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('borrowerName').value.trim();
@@ -515,7 +542,6 @@ document.getElementById('borrowerForm').addEventListener('submit', async (e) => 
     }
 });
 
-// Borrower Form 2 (Add Borrower page)
 document.getElementById('borrowerForm2').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('borrowerName2').value.trim();
@@ -532,7 +558,6 @@ document.getElementById('borrowerForm2').addEventListener('submit', async (e) =>
     }
 });
 
-// Debt Form
 document.getElementById('debtForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const borrowerId = document.getElementById('debtBorrower').value;
@@ -556,7 +581,6 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
     }
 });
 
-// Payment Form
 document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const debtId = document.getElementById('paymentDebt').value;
@@ -591,8 +615,5 @@ async function initApp() {
     console.log('✅ App ready!');
 }
 
-// Load app
 initApp();
-
-// Auto-refresh every 30 seconds
 setInterval(refreshDashboard, 30000);

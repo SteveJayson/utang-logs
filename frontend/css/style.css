@@ -328,11 +328,11 @@ header p {
     transform: translateY(-2px);
 }
 
-/* ----- DELETE BUTTON ----- */
-.btn-delete {
+/* ----- DELETE DEBT BUTTON ----- */
+.btn-delete-debt {
     background: none;
     border: none;
-    font-size: 1.2rem;
+    font-size: 1rem;
     cursor: pointer;
     padding: 4px 8px;
     border-radius: var(--radius-sm);
@@ -341,17 +341,62 @@ header p {
     color: var(--gray-400);
     background: var(--gray-100);
     line-height: 1;
+    margin-left: 8px;
 }
 
-.btn-delete:hover {
+.btn-delete-debt:hover {
     background: var(--danger-light);
     color: var(--danger);
     transform: scale(1.1);
     box-shadow: none;
 }
 
-.btn-delete:active {
+.btn-delete-debt:active {
     transform: scale(0.9);
+}
+
+/* Make debt item flex layout work with delete button */
+.debt-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    transition: var(--transition);
+    gap: 8px;
+}
+
+.debt-item .debt-info {
+    flex: 1;
+    cursor: pointer;
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+    .debt-item {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .debt-item .debt-info {
+        flex: 1 1 100%;
+        order: 1;
+    }
+    
+    .debt-item .debt-amount {
+        order: 2;
+    }
+    
+    .debt-item .debt-status {
+        order: 3;
+    }
+    
+    .btn-delete-debt {
+        order: 4;
+        margin-left: auto;
+    }
 }
 
 /* ----- BADGES ----- */
