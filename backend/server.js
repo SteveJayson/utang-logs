@@ -22,6 +22,57 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ============================================
+// DIRECT ROUTE FOR DEBT DETAILS (FIX)
+// ============================================
+app.get('/api/debts/:id', async (req, res) => {
+    try {
+        const Debt = require('./models/Debt');
+        const Payment = require('./models/Payment');
+        
+        console.log('🔍 Fetching debt with ID:', req.params.id);
+        
+        const debt = await Debt.findById(req.params.id);
+        if (!debt) {
+            console.log('❌ Debt not found');
+            return res.status(404).json({
+                success: false,
+                message: 'Debt not found'
+            });
+        }
+        
+        const payments = await Payment.find({ debtId: req.params.id });
+        const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
+        
+        console.log('✅ Debt found, payments:', payments.length);
+        
+        res.json({
+            success: true,
+            data: {
+                _id: debt._id,
+                amount: debt.amount,
+                reason: debt.reason,
+                status: debt.status || 'Unpaid',
+                dateBorrowed: debt.dateBorrowed,
+                totalPaid: totalPaid,
+                remainingBalance: debt.amount - totalPaid,
+                payments: payments.map(p => ({
+                    _id: p._id,
+                    amountPaid: p.amountPaid,
+                    datePaid: p.datePaid,
+                    notes: p.notes || ''
+                }))
+            }
+        });
+    } catch (error) {
+        console.error('❌ Error in debt details:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
 // Routes
 const borrowerRoutes = require('./routes/borrowers');
 const debtRoutes = require('./routes/debts');
