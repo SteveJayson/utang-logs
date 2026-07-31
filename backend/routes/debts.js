@@ -4,7 +4,7 @@ const debtController = require('../controllers/debtController');
 
 router.post('/', debtController.createDebt);
 router.get('/borrower/:borrowerId', debtController.getDebtsByBorrower);
-router.get('/:id', debtController.getDebtById);  // ← This must exist!
+router.get('/:id', debtController.getDebtById);  // ← THIS MUST EXIST!
 router.put('/:id/status', debtController.updateDebtStatus);
 
 module.exports = router;
