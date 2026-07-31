@@ -42,22 +42,11 @@ exports.getDebtsByBorrower = async (req, res) => {
         const { borrowerId } = req.params;
         
         const debts = await Debt.find({ borrowerId })
-            .sort({ dateBorrowed: -1 })
-            .populate('payments');
+            .sort({ dateBorrowed: -1 });
             
-        const formattedDebts = debts.map(debt => {
-            const payments = debt.payments || [];
-            const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
-            return {
-                ...debt.toJSON(),
-                totalPaid,
-                remainingBalance: debt.amount - totalPaid
-            };
-        });
-        
         res.json({
             success: true,
-            data: formattedDebts
+            data: debts
         });
     } catch (error) {
         res.status(400).json({
@@ -67,25 +56,40 @@ exports.getDebtsByBorrower = async (req, res) => {
     }
 };
 
-// Get single debt with full details (FIXED)
+// SIMPLIFIED: Get single debt with payments
 exports.getDebtById = async (req, res) => {
     try {
         const { id } = req.params;
         
+        console.log('Fetching debt with ID:', id);
+        
+        // Find the debt
         const debt = await Debt.findById(id);
         
         if (!debt) {
+            console.log('Debt not found with ID:', id);
             return res.status(404).json({
                 success: false,
                 message: 'Debt not found'
             });
         }
         
-        // Get payments separately
+        console.log('Debt found:', debt);
+        
+        // Get payments for this debt
         const payments = await Payment.find({ debtId: id });
-        const borrower = await Borrower.findById(debt.borrowerId);
+        console.log('Payments found:', payments.length);
         
         const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
+        
+        // Get borrower info (optional)
+        let borrowerName = 'Unknown';
+        try {
+            const borrower = await Borrower.findById(debt.borrowerId);
+            if (borrower) borrowerName = borrower.name;
+        } catch (err) {
+            console.log('Could not fetch borrower:', err.message);
+        }
         
         res.json({
             success: true,
@@ -93,27 +97,24 @@ exports.getDebtById = async (req, res) => {
                 _id: debt._id,
                 amount: debt.amount,
                 reason: debt.reason,
-                status: debt.status,
+                status: debt.status || 'Unpaid',
                 dateBorrowed: debt.dateBorrowed,
-                borrower: borrower ? {
-                    _id: borrower._id,
-                    name: borrower.name,
-                    contactInfo: borrower.contactInfo
-                } : null,
+                borrowerName: borrowerName,
                 totalPaid: totalPaid,
                 remainingBalance: debt.amount - totalPaid,
                 payments: payments.map(p => ({
                     _id: p._id,
                     amountPaid: p.amountPaid,
                     datePaid: p.datePaid,
-                    notes: p.notes
+                    notes: p.notes || ''
                 }))
             }
         });
     } catch (error) {
-        res.status(400).json({
+        console.error('Error in getDebtById:', error);
+        res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Server error: ' + error.message
         });
     }
 };
