@@ -81,10 +81,9 @@ app.get('/api/debts/:id', async (req, res) => {
     }
 });
 
-// ============================================
-// ROUTES
-// ============================================
-const borrowerRoutes = require('./routes/borrowers');
+
+// Routes
+const borrowerRoutes = require('./routes/borrowers');  // ← Make sure this is './routes/borrowers' (not 'routers')
 const debtRoutes = require('./routes/debts');
 const paymentRoutes = require('./routes/payments');
 
