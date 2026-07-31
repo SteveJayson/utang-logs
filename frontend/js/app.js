@@ -2,7 +2,7 @@
 // UTANG LOGS - Complete Application
 // ========================================
 
-const API_URL = 'https://utang-logs.onrender.com/api';
+const API_URL = 'https://utang-logs.onrender.com/api';  // ← THIS MUST BE YOUR RENDER URL!
 let currentBorrowerId = null;
 
 // ========================================
@@ -94,12 +94,15 @@ function showSection(sectionId) {
 
 async function fetchBorrowers() {
     try {
+        console.log('🔄 Fetching borrowers from:', `${API_URL}/borrowers`);
         const response = await fetch(`${API_URL}/borrowers`);
         if (!response.ok) throw new Error('Failed to fetch borrowers');
         const data = await response.json();
+        console.log('✅ Borrowers fetched:', data.data?.length || 0);
         return data.data || [];
     } catch (error) {
-        console.error('Error fetching borrowers:', error);
+        console.error('❌ Error fetching borrowers:', error);
+        showToast('Error connecting to server. Make sure backend is running.', 'error');
         return [];
     }
 }
@@ -118,12 +121,27 @@ async function fetchBorrowerDetails(borrowerId) {
 
 async function fetchDebtDetails(debtId) {
     try {
+        console.log('🔍 Fetching debt details for ID:', debtId);
         const response = await fetch(`${API_URL}/debts/${debtId}`);
-        if (!response.ok) throw new Error('Failed to fetch debt details');
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Error response:', errorText);
+            throw new Error(`Failed to fetch debt details: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('✅ Debt details data:', data);
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to fetch debt details');
+        }
+        
         return data.data;
     } catch (error) {
-        console.error('Error fetching debt details:', error);
+        console.error('❌ Error fetching debt details:', error);
+        showToast('Error loading debt details: ' + error.message, 'error');
         return null;
     }
 }
@@ -321,69 +339,86 @@ async function showBorrowerDebts(borrowerId) {
 }
 
 async function showDebtPayments(debtId) {
-    const debtData = await fetchDebtDetails(debtId);
+    console.log('🟢 Showing debt payments for ID:', debtId);
     
-    if (!debtData) {
-        showToast('Error loading debt details', 'error');
+    if (!debtId) {
+        showToast('Invalid debt ID', 'error');
         return;
     }
     
-    const content = document.getElementById('debtDetailContent');
-    
-    let paymentsHtml = '';
-    if (debtData.payments && debtData.payments.length > 0) {
-        paymentsHtml = debtData.payments.map(p => `
-            <div class="payment-item">
-                <div class="payment-info">
-                    <span class="amount">₱${p.amountPaid.toFixed(2)}</span>
-                    <span class="date">📅 ${formatDate(p.datePaid)}</span>
-                    ${p.notes ? `<span class="notes">📝 ${p.notes}</span>` : ''}
+    try {
+        const debtData = await fetchDebtDetails(debtId);
+        console.log('📦 Debt data received:', debtData);
+        
+        if (!debtData) {
+            showToast('Error loading debt details - debt not found', 'error');
+            return;
+        }
+        
+        const content = document.getElementById('debtDetailContent');
+        
+        // Build payments HTML
+        let paymentsHtml = '';
+        if (debtData.payments && debtData.payments.length > 0) {
+            paymentsHtml = debtData.payments.map(p => `
+                <div class="payment-item">
+                    <div class="payment-info">
+                        <span class="amount">₱${p.amountPaid.toFixed(2)}</span>
+                        <span class="date">📅 ${formatDate(p.datePaid)}</span>
+                        ${p.notes ? `<span class="notes">📝 ${p.notes}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            paymentsHtml = `<div class="no-payments"><span class="icon">💸</span>No payments recorded for this debt yet.</div>`;
+        }
+        
+        const debtHtml = `
+            <div class="debt-payment-detail" style="background:var(--gray-50);padding:20px;border-radius:var(--radius-sm);margin:15px 0 20px 0;border-left:4px solid var(--primary);">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div>
+                        <strong style="font-size:1.1rem;">${debtData.reason || 'No reason provided'}</strong>
+                        <span style="margin-left:12px;font-size:0.9rem;color:var(--gray-500);">
+                            📅 ${formatDate(debtData.dateBorrowed)}
+                        </span>
+                    </div>
+                    <div>
+                        <span style="font-weight:700;font-size:1.2rem;color:var(--gray-800);">
+                            ₱${(debtData.amount || 0).toFixed(2)}
+                        </span>
+                        <span style="margin-left:10px;padding:3px 14px;border-radius:20px;font-size:0.75rem;font-weight:700;background:${debtData.status === 'Paid' ? 'var(--success-light)' : debtData.status === 'Partial' ? 'var(--warning-light)' : 'var(--danger-light)'};color:${debtData.status === 'Paid' ? '#065f46' : debtData.status === 'Partial' ? '#92400e' : '#991b1b'};">
+                            ${debtData.status || 'Unknown'}
+                        </span>
+                    </div>
+                </div>
+                <div style="margin-top:8px;font-size:0.95rem;color:var(--gray-500);">
+                    Paid: ₱${(debtData.totalPaid || 0).toFixed(2)} | Remaining: ₱${(debtData.remainingBalance || 0).toFixed(2)}
                 </div>
             </div>
-        `).join('');
-    } else {
-        paymentsHtml = `<div class="no-payments"><span class="icon">💸</span>No payments recorded for this debt yet.</div>`;
-    }
-    
-    const debtHtml = `
-        <div style="background:var(--gray-50);padding:18px;border-radius:var(--radius-sm);margin:15px 0 20px 0;border-left:4px solid var(--primary);">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                <div>
-                    <strong style="font-size:1.1rem;">${debtData.reason}</strong>
-                    <span style="margin-left:12px;font-size:0.9rem;color:var(--gray-500);">
-                        📅 ${formatDate(debtData.dateBorrowed)}
-                    </span>
-                </div>
-                <div>
-                    <span style="font-weight:700;font-size:1.2rem;color:var(--gray-800);">
-                        ₱${debtData.amount.toFixed(2)}
-                    </span>
-                    <span style="margin-left:10px;padding:3px 14px;border-radius:20px;font-size:0.75rem;font-weight:700;background:${debtData.status === 'Paid' ? 'var(--success-light)' : debtData.status === 'Partial' ? 'var(--warning-light)' : 'var(--danger-light)'};color:${debtData.status === 'Paid' ? '#065f46' : debtData.status === 'Partial' ? '#92400e' : '#991b1b'};">
-                        ${debtData.status}
-                    </span>
-                </div>
-            </div>
-            <div style="margin-top:8px;font-size:0.95rem;color:var(--gray-500);">
-                Paid: ₱${debtData.totalPaid.toFixed(2)} | Remaining: ₱${debtData.remainingBalance.toFixed(2)}
-            </div>
-        </div>
+            
+            <h3 style="margin:20px 0 12px 0;font-size:1.1rem;">💰 Payment History</h3>
+            ${paymentsHtml}
+        `;
         
-        <h3 style="margin:20px 0 12px 0;font-size:1.1rem;">💰 Payment History</h3>
-        ${paymentsHtml}
-    `;
-    
-    // Add the debt detail to the content
-    const debtList = content.querySelector('.debt-list');
-    if (debtList) {
-        const existingDetail = content.querySelector('.debt-payment-detail');
-        if (existingDetail) existingDetail.remove();
+        // Find the debt list and insert before it
+        const debtList = content.querySelector('.debt-list');
+        if (debtList) {
+            const existingDetail = content.querySelector('.debt-payment-detail');
+            if (existingDetail) existingDetail.remove();
+            
+            const detailDiv = document.createElement('div');
+            detailDiv.className = 'debt-payment-detail';
+            detailDiv.innerHTML = debtHtml;
+            
+            debtList.parentNode.insertBefore(detailDiv, debtList);
+            detailDiv.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            content.innerHTML += debtHtml;
+        }
         
-        const detailDiv = document.createElement('div');
-        detailDiv.className = 'debt-payment-detail';
-        detailDiv.innerHTML = debtHtml;
-        
-        debtList.parentNode.insertBefore(detailDiv, debtList);
-        detailDiv.scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        console.error('❌ Error in showDebtPayments:', error);
+        showToast('Error loading debt details: ' + error.message, 'error');
     }
 }
 
@@ -491,7 +526,6 @@ document.getElementById('borrowerForm2').addEventListener('submit', async (e) =>
         document.getElementById('borrowerForm2').reset();
         await refreshDashboard();
         showToast('✅ Borrower added successfully!', 'success');
-        // Switch to dashboard
         showSection('dashboard');
     } catch (error) {
         showToast('❌ Error: ' + error.message, 'error');
@@ -516,7 +550,6 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
         document.getElementById('debtForm').reset();
         await refreshDashboard();
         showToast('✅ Debt logged successfully!', 'success');
-        // Switch to dashboard
         showSection('dashboard');
     } catch (error) {
         showToast('❌ Error: ' + error.message, 'error');
@@ -541,7 +574,6 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
         document.getElementById('paymentDebt').innerHTML = '<option value="">Select Debt</option>';
         await refreshDashboard();
         showToast('✅ Payment recorded successfully!', 'success');
-        // Switch to dashboard
         showSection('dashboard');
     } catch (error) {
         showToast('❌ Error: ' + error.message, 'error');
@@ -553,7 +585,10 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
 // ========================================
 
 async function initApp() {
+    console.log('🚀 Utang Logs App Starting...');
+    console.log('📡 API URL:', API_URL);
     await refreshDashboard();
+    console.log('✅ App ready!');
 }
 
 // Load app
