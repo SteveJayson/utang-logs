@@ -35,28 +35,43 @@ exports.createDebt = async (req, res) => {
     }
 };
 
-// Get all debts for a borrower
-exports.getDebtsByBorrower = async (req, res) => {
+// Get single debt with full details
+exports.getDebtById = async (req, res) => {
     try {
-        const { borrowerId } = req.params;
+        const { id } = req.params;
         
-        const debts = await Debt.find({ borrowerId })
-            .sort({ dateBorrowed: -1 })
-            .populate('payments');
+        const debt = await Debt.findById(id)
+            .populate('payments')
+            .populate('borrowerId', 'name contactInfo');
             
-        const formattedDebts = debts.map(debt => {
-            const payments = debt.payments || [];
-            const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
-            return {
-                ...debt.toJSON(),
-                totalPaid,
-                remainingBalance: debt.amount - totalPaid
-            };
-        });
+        if (!debt) {
+            return res.status(404).json({
+                success: false,
+                message: 'Debt not found'
+            });
+        }
+        
+        const payments = debt.payments || [];
+        const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
         
         res.json({
             success: true,
-            data: formattedDebts
+            data: {
+                _id: debt._id,
+                amount: debt.amount,
+                reason: debt.reason,
+                status: debt.status,
+                dateBorrowed: debt.dateBorrowed,
+                borrower: debt.borrowerId,
+                totalPaid: totalPaid,
+                remainingBalance: debt.amount - totalPaid,
+                payments: payments.map(p => ({
+                    _id: p._id,
+                    amountPaid: p.amountPaid,
+                    datePaid: p.datePaid,
+                    notes: p.notes
+                }))
+            }
         });
     } catch (error) {
         res.status(400).json({

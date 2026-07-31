@@ -38,28 +38,79 @@ exports.getAllBorrowers = async (req, res) => {
     }
 };
 
+// Get a single borrower with their debts and payment details
 exports.getBorrowerById = async (req, res) => {
     try {
         const { id } = req.params;
+        
         const borrower = await Borrower.findById(id);
         if (!borrower) {
-            return res.status(404).json({ success: false, message: 'Borrower not found' });
+            return res.status(404).json({
+                success: false,
+                message: 'Borrower not found'
+            });
         }
-        const debts = await Debt.find({ borrowerId: id }).populate('payments').sort({ dateBorrowed: -1 });
-        const payments = await Payment.find({ debtId: { $in: debts.map(d => d._id) } });
+        
+        // Get all debts with payments populated
+        const debts = await Debt.find({ borrowerId: id })
+            .populate('payments')
+            .sort({ dateBorrowed: -1 });
+            
+        // Format debts with payment details
+        const formattedDebts = debts.map(debt => {
+            const payments = debt.payments || [];
+            const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
+            const remaining = debt.amount - totalPaid;
+            
+            return {
+                _id: debt._id,
+                amount: debt.amount,
+                reason: debt.reason,
+                status: debt.status,
+                dateBorrowed: debt.dateBorrowed,
+                totalPaid: totalPaid,
+                remainingBalance: remaining,
+                payments: payments.map(p => ({
+                    _id: p._id,
+                    amountPaid: p.amountPaid,
+                    datePaid: p.datePaid,
+                    notes: p.notes
+                }))
+            };
+        });
+        
+        // Calculate totals
         const totalBorrowed = debts.reduce((sum, debt) => sum + debt.amount, 0);
-        const totalPaid = payments.reduce((sum, payment) => sum + payment.amountPaid, 0);
+        const totalPaid = debts.reduce((sum, debt) => {
+            const paid = debt.payments ? debt.payments.reduce((s, p) => s + p.amountPaid, 0) : 0;
+            return sum + paid;
+        }, 0);
         const remainingBalance = totalBorrowed - totalPaid;
+        
         res.json({
             success: true,
             data: {
-                borrower,
-                debts,
-                summary: { totalBorrowed, totalPaid, remainingBalance, debtCount: debts.length, activeDebtCount: debts.filter(d => d.status !== 'Paid').length }
+                borrower: {
+                    _id: borrower._id,
+                    name: borrower.name,
+                    contactInfo: borrower.contactInfo,
+                    createdAt: borrower.createdAt
+                },
+                debts: formattedDebts,
+                summary: {
+                    totalBorrowed,
+                    totalPaid,
+                    remainingBalance,
+                    debtCount: debts.length,
+                    activeDebtCount: debts.filter(d => d.status !== 'Paid').length
+                }
             }
         });
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 

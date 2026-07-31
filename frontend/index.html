@@ -13,73 +13,115 @@
             <p>Track your debts and payments</p>
         </header>
 
-        <!-- Add Borrower Form -->
-        <section class="form-section">
-            <h2>Add New Borrower</h2>
-            <form id="borrowerForm">
-                <div class="form-group">
-                    <input type="text" id="borrowerName" placeholder="Borrower Name" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="borrowerContact" placeholder="Contact Info (optional)">
-                </div>
-                <button type="submit">Add Borrower</button>
-            </form>
-        </section>
+        <!-- Navigation -->
+        <nav class="nav-bar">
+            <button onclick="showSection('dashboard')" class="nav-btn active" id="navDashboard">
+                📊 Dashboard
+            </button>
+            <button onclick="showSection('addBorrower')" class="nav-btn" id="navAddBorrower">
+                👤 Add Borrower
+            </button>
+            <button onclick="showSection('addDebt')" class="nav-btn" id="navAddDebt">
+                💰 Add Debt
+            </button>
+            <button onclick="showSection('addPayment')" class="nav-btn" id="navAddPayment">
+                💵 Record Payment
+            </button>
+        </nav>
 
-        <!-- Add Debt Form -->
-        <section class="form-section">
-            <h2>Log New Debt</h2>
-            <form id="debtForm">
-                <div class="form-group">
-                    <select id="debtBorrower" required>
-                        <option value="">Select Borrower</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="number" id="debtAmount" placeholder="Amount (₱)" required step="0.01">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="debtReason" placeholder="Reason/Item" required>
-                </div>
-                <div class="form-group">
-                    <input type="date" id="debtDate">
-                </div>
-                <button type="submit">Log Debt</button>
-            </form>
-        </section>
+        <!-- Sections -->
+        <div id="sectionDashboard" class="section active">
+            <!-- Add Borrower Form (in dashboard) -->
+            <section class="form-section">
+                <h2>Quick Add Borrower</h2>
+                <form id="borrowerForm">
+                    <div class="form-group">
+                        <input type="text" id="borrowerName" placeholder="Borrower Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="borrowerContact" placeholder="Contact Info (optional)">
+                    </div>
+                    <button type="submit">Add Borrower</button>
+                </form>
+            </section>
 
-        <!-- Record Payment Form -->
-        <section class="form-section">
-            <h2>Record Payment</h2>
-            <form id="paymentForm">
-                <div class="form-group">
-                    <select id="paymentBorrower" required>
-                        <option value="">Select Borrower</option>
-                    </select>
+            <!-- Dashboard -->
+            <section class="dashboard">
+                <h2>📊 All Borrowers</h2>
+                <div id="borrowerList">
+                    <p>Loading borrowers...</p>
                 </div>
-                <div class="form-group">
-                    <select id="paymentDebt" required>
-                        <option value="">Select Debt</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="number" id="paymentAmount" placeholder="Amount Paid (₱)" required step="0.01">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="paymentNotes" placeholder="Notes (optional)">
-                </div>
-                <button type="submit">Record Payment</button>
-            </form>
-        </section>
+            </section>
+        </div>
 
-        <!-- Dashboard/Summary -->
-        <section class="dashboard">
-            <h2>Dashboard</h2>
-            <div id="borrowerList">
-                <p>Loading borrowers...</p>
-            </div>
-        </section>
+        <div id="sectionAddBorrower" class="section">
+            <section class="form-section">
+                <h2>👤 Add New Borrower</h2>
+                <form id="borrowerForm2">
+                    <div class="form-group">
+                        <input type="text" id="borrowerName2" placeholder="Borrower Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="borrowerContact2" placeholder="Contact Info (optional)">
+                    </div>
+                    <button type="submit">Add Borrower</button>
+                </form>
+            </section>
+        </div>
+
+        <div id="sectionAddDebt" class="section">
+            <section class="form-section">
+                <h2>💰 Log New Debt</h2>
+                <form id="debtForm">
+                    <div class="form-group">
+                        <select id="debtBorrower" required>
+                            <option value="">Select Borrower</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="debtAmount" placeholder="Amount (₱)" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="debtReason" placeholder="Reason/Item" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="date" id="debtDate">
+                    </div>
+                    <button type="submit">Log Debt</button>
+                </form>
+            </section>
+        </div>
+
+        <div id="sectionAddPayment" class="section">
+            <section class="form-section">
+                <h2>💵 Record Payment</h2>
+                <form id="paymentForm">
+                    <div class="form-group">
+                        <select id="paymentBorrower" required>
+                            <option value="">Select Borrower</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="paymentDebt" required>
+                            <option value="">Select Debt</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="paymentAmount" placeholder="Amount Paid (₱)" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="paymentNotes" placeholder="Notes (optional)">
+                    </div>
+                    <button type="submit">Record Payment</button>
+                </form>
+            </section>
+        </div>
+
+        <!-- Debt Detail View (Hidden by default) -->
+        <div id="debtDetailView" class="debt-detail-view" style="display:none;">
+            <button onclick="closeDebtDetail()" class="back-btn">← Back to Dashboard</button>
+            <div id="debtDetailContent"></div>
+        </div>
     </div>
 
     <script src="js/app.js"></script>
