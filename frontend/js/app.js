@@ -1,7 +1,75 @@
+// ========================================
+// UTANG LOGS - Complete Application
+// ========================================
+
 const API_URL = 'https://utang-logs.onrender.com/api';
 let currentBorrowerId = null;
 
-// ==================== NAVIGATION ====================
+// ========================================
+// TOAST NOTIFICATIONS
+// ========================================
+
+function showToast(message, type = 'info') {
+    // Remove existing toast
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 400);
+    }, 4000);
+}
+
+// ========================================
+// DELETE BORROWER
+// ========================================
+
+async function deleteBorrower(borrowerId, borrowerName, hasRemainingBalance) {
+    // Check if there's remaining balance
+    if (hasRemainingBalance > 0) {
+        const confirmDelete = confirm(
+            `⚠️ ${borrowerName} still has remaining balance of ₱${hasRemainingBalance.toFixed(2)}!\n\n` +
+            `Are you sure you want to delete this borrower and ALL their debts?\n` +
+            `This action cannot be undone!`
+        );
+        if (!confirmDelete) return;
+    } else {
+        const confirmDelete = confirm(
+            `✅ ${borrowerName} is fully paid!\n\n` +
+            `Do you want to delete this borrower and their records?\n` +
+            `This action cannot be undone!`
+        );
+        if (!confirmDelete) return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/borrowers/${borrowerId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to delete borrower');
+        }
+        
+        // Refresh the dashboard
+        await refreshDashboard();
+        showToast('✅ Borrower deleted successfully!', 'success');
+    } catch (error) {
+        showToast('❌ Error: ' + error.message, 'error');
+    }
+}
+
+// ========================================
+// NAVIGATION
+// ========================================
 
 function showSection(sectionId) {
     // Hide all sections
@@ -20,7 +88,9 @@ function showSection(sectionId) {
     document.getElementById('debtDetailView').style.display = 'none';
 }
 
-// ==================== FETCH FUNCTIONS ====================
+// ========================================
+// FETCH FUNCTIONS
+// ========================================
 
 async function fetchBorrowers() {
     try {
@@ -58,7 +128,9 @@ async function fetchDebtDetails(debtId) {
     }
 }
 
-// ==================== BORROWER FUNCTIONS ====================
+// ========================================
+// CRUD OPERATIONS
+// ========================================
 
 async function addBorrower(name, contactInfo) {
     try {
@@ -80,8 +152,6 @@ async function addBorrower(name, contactInfo) {
     }
 }
 
-// ==================== DEBT FUNCTIONS ====================
-
 async function addDebt(borrowerId, amount, reason, dateBorrowed) {
     try {
         const response = await fetch(`${API_URL}/debts`, {
@@ -101,8 +171,6 @@ async function addDebt(borrowerId, amount, reason, dateBorrowed) {
         throw error;
     }
 }
-
-// ==================== PAYMENT FUNCTIONS ====================
 
 async function addPayment(debtId, amountPaid, notes) {
     try {
@@ -124,7 +192,9 @@ async function addPayment(debtId, amountPaid, notes) {
     }
 }
 
-// ==================== UI RENDER FUNCTIONS ====================
+// ========================================
+// UI RENDER FUNCTIONS
+// ========================================
 
 function renderBorrowers(borrowers) {
     const container = document.getElementById('borrowerList');
@@ -133,16 +203,34 @@ function renderBorrowers(borrowers) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="icon">📭</div>
-                <p>No borrowers yet. Add your first borrower above!</p>
+                <h3>No borrowers yet</h3>
+                <p>Add your first borrower using the form above!</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = borrowers.map(borrower => `
-        <div class="borrower-card" onclick="showBorrowerDebts('${borrower._id}')">
-            <h3>${borrower.name}</h3>
-            ${borrower.contactInfo ? `<p>📱 ${borrower.contactInfo}</p>` : ''}
+    container.innerHTML = borrowers.map(borrower => {
+        const isFullyPaid = borrower.totalRemaining <= 0 && borrower.totalBorrowed > 0;
+        const hasDebts = borrower.debtCount > 0;
+        
+        return `
+        <div class="borrower-card">
+            <div class="card-top">
+                <div>
+                    <span class="name">${borrower.name}</span>
+                    ${borrower.contactInfo ? `<span class="contact">📱 ${borrower.contactInfo}</span>` : ''}
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <span class="debt-count">${borrower.activeDebtCount || 0} active debts</span>
+                    ${isFullyPaid ? '<span class="badge-paid">✅ Fully Paid</span>' : ''}
+                    <button onclick="event.stopPropagation(); deleteBorrower('${borrower._id}', '${borrower.name}', ${borrower.totalRemaining || 0})" 
+                            class="btn-delete"
+                            title="Delete borrower${!isFullyPaid && hasDebts ? ' (has remaining balance)' : ''}">
+                        🗑️
+                    </button>
+                </div>
+            </div>
             <div class="details">
                 <div class="detail-item">
                     <label>Total Borrowed</label>
@@ -159,13 +247,15 @@ function renderBorrowers(borrowers) {
                     </div>
                 </div>
                 <div class="detail-item">
-                    <label>Active Debts</label>
-                    <div class="value">${borrower.activeDebtCount || 0}</div>
+                    <label>Total Debts</label>
+                    <div class="value">${borrower.debtCount || 0}</div>
                 </div>
             </div>
-            <div class="click-hint">👆 Click to view debts</div>
+            <div class="click-hint" onclick="event.stopPropagation(); showBorrowerDebts('${borrower._id}')">
+                👆 Click to view debts
+            </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 async function showBorrowerDebts(borrowerId) {
@@ -173,13 +263,12 @@ async function showBorrowerDebts(borrowerId) {
     const data = await fetchBorrowerDetails(borrowerId);
     
     if (!data) {
-        alert('Error loading borrower details');
+        showToast('Error loading borrower details', 'error');
         return;
     }
     
     const { borrower, debts, summary } = data;
     
-    // Show debt detail view
     const detailView = document.getElementById('debtDetailView');
     const content = document.getElementById('debtDetailContent');
     
@@ -193,7 +282,7 @@ async function showBorrowerDebts(borrowerId) {
                 </div>
                 <div class="debt-amount ${debt.status.toLowerCase()}">
                     ₱${debt.amount.toFixed(2)}
-                    <span style="font-size:0.8rem;color:#718096;font-weight:400;">
+                    <span style="font-size:0.8rem;color:var(--gray-400);font-weight:400;">
                         (Paid: ₱${debt.totalPaid.toFixed(2)})
                     </span>
                 </div>
@@ -201,7 +290,7 @@ async function showBorrowerDebts(borrowerId) {
             </div>
         `).join('');
     } else {
-        debtsHtml = `<p style="text-align:center;color:#a0aec0;padding:20px;">No debts recorded for this borrower.</p>`;
+        debtsHtml = `<div class="no-payments"><span class="icon">📭</span>No debts recorded for this borrower.</div>`;
     }
     
     content.innerHTML = `
@@ -210,20 +299,19 @@ async function showBorrowerDebts(borrowerId) {
                 <h2>${borrower.name}'s Debts</h2>
                 ${borrower.contactInfo ? `<p>📱 ${borrower.contactInfo}</p>` : ''}
             </div>
-            <div>
-                <div style="text-align:right;">
-                    <div>Total: <strong>₱${summary.totalBorrowed.toFixed(2)}</strong></div>
-                    <div>Paid: <strong>₱${summary.totalPaid.toFixed(2)}</strong></div>
-                    <div>Remaining: <strong style="color:${summary.remainingBalance > 0 ? '#e53e3e' : '#38a169'}">
-                        ₱${summary.remainingBalance.toFixed(2)}
-                    </strong></div>
-                </div>
+            <div class="debt-summary">
+                <div>Total: <strong>₱${summary.totalBorrowed.toFixed(2)}</strong></div>
+                <div>Paid: <strong>₱${summary.totalPaid.toFixed(2)}</strong></div>
+                <div>Remaining: <strong style="color:${summary.remainingBalance > 0 ? 'var(--danger)' : 'var(--success)'}">
+                    ₱${summary.remainingBalance.toFixed(2)}
+                </strong></div>
             </div>
         </div>
         <div class="debt-list">
+            <div class="debt-list-title">💰 Debts (${debts.length})</div>
             ${debtsHtml}
         </div>
-        <div class="click-hint" style="margin-top:15px;text-align:center;color:#a0aec0;">
+        <div class="click-hint" style="margin-top:15px;text-align:center;color:var(--gray-400);font-size:0.85rem;">
             👆 Click a debt to view payments
         </div>
     `;
@@ -236,13 +324,12 @@ async function showDebtPayments(debtId) {
     const debtData = await fetchDebtDetails(debtId);
     
     if (!debtData) {
-        alert('Error loading debt details');
+        showToast('Error loading debt details', 'error');
         return;
     }
     
     const content = document.getElementById('debtDetailContent');
     
-    // Find the current debt item and scroll to it, then show payments
     let paymentsHtml = '';
     if (debtData.payments && debtData.payments.length > 0) {
         paymentsHtml = debtData.payments.map(p => `
@@ -255,63 +342,59 @@ async function showDebtPayments(debtId) {
             </div>
         `).join('');
     } else {
-        paymentsHtml = `<div class="no-payments">No payments recorded for this debt yet.</div>`;
+        paymentsHtml = `<div class="no-payments"><span class="icon">💸</span>No payments recorded for this debt yet.</div>`;
     }
     
-    // Add payment details to the existing view
     const debtHtml = `
-        <div style="background:#f7fafc;padding:15px;border-radius:8px;margin:10px 0 20px 0;border-left:4px solid #667eea;">
-            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+        <div style="background:var(--gray-50);padding:18px;border-radius:var(--radius-sm);margin:15px 0 20px 0;border-left:4px solid var(--primary);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
                 <div>
-                    <strong>${debtData.reason}</strong>
-                    <span style="margin-left:10px;font-size:0.9rem;color:#718096;">
+                    <strong style="font-size:1.1rem;">${debtData.reason}</strong>
+                    <span style="margin-left:12px;font-size:0.9rem;color:var(--gray-500);">
                         📅 ${formatDate(debtData.dateBorrowed)}
                     </span>
                 </div>
                 <div>
-                    <span style="font-weight:700;font-size:1.1rem;color:#2d3748;">
+                    <span style="font-weight:700;font-size:1.2rem;color:var(--gray-800);">
                         ₱${debtData.amount.toFixed(2)}
                     </span>
-                    <span style="margin-left:10px;padding:2px 12px;border-radius:12px;font-size:0.8rem;background:${debtData.status === 'Paid' ? '#c6f6d5' : debtData.status === 'Partial' ? '#feebc8' : '#fed7d7'};">
+                    <span style="margin-left:10px;padding:3px 14px;border-radius:20px;font-size:0.75rem;font-weight:700;background:${debtData.status === 'Paid' ? 'var(--success-light)' : debtData.status === 'Partial' ? 'var(--warning-light)' : 'var(--danger-light)'};color:${debtData.status === 'Paid' ? '#065f46' : debtData.status === 'Partial' ? '#92400e' : '#991b1b'};">
                         ${debtData.status}
                     </span>
                 </div>
             </div>
-            <div style="margin-top:5px;font-size:0.9rem;color:#718096;">
+            <div style="margin-top:8px;font-size:0.95rem;color:var(--gray-500);">
                 Paid: ₱${debtData.totalPaid.toFixed(2)} | Remaining: ₱${debtData.remainingBalance.toFixed(2)}
             </div>
         </div>
         
-        <h3 style="margin:20px 0 10px 0;">💰 Payment History</h3>
+        <h3 style="margin:20px 0 12px 0;font-size:1.1rem;">💰 Payment History</h3>
         ${paymentsHtml}
     `;
     
-    // Find the debt item and replace with expanded view
-    // We'll just append/update the content
-    // For simplicity, we'll add it to the top of the debt list
-    
+    // Add the debt detail to the content
     const debtList = content.querySelector('.debt-list');
     if (debtList) {
-        // Keep the debt list but add the detail above it
+        const existingDetail = content.querySelector('.debt-payment-detail');
+        if (existingDetail) existingDetail.remove();
+        
         const detailDiv = document.createElement('div');
         detailDiv.className = 'debt-payment-detail';
         detailDiv.innerHTML = debtHtml;
         
-        // Insert before the debt list
         debtList.parentNode.insertBefore(detailDiv, debtList);
-        
-        // Scroll to it
         detailDiv.scrollIntoView({ behavior: 'smooth' });
     }
 }
 
 function closeDebtDetail() {
     document.getElementById('debtDetailView').style.display = 'none';
-    // Refresh dashboard
     refreshDashboard();
 }
 
-// ==================== POPULATE SELECTS ====================
+// ========================================
+// POPULATE SELECTS
+// ========================================
 
 async function populateSelects() {
     const borrowers = await fetchBorrowers();
@@ -357,7 +440,9 @@ async function populateSelects() {
     });
 }
 
-// ==================== UTILITY FUNCTIONS ====================
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
 
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
@@ -375,7 +460,9 @@ async function refreshDashboard() {
     await populateSelects();
 }
 
-// ==================== EVENT LISTENERS ====================
+// ========================================
+// EVENT LISTENERS
+// ========================================
 
 // Borrower Form 1 (Dashboard)
 document.getElementById('borrowerForm').addEventListener('submit', async (e) => {
@@ -387,13 +474,13 @@ document.getElementById('borrowerForm').addEventListener('submit', async (e) => 
         await addBorrower(name, contactInfo);
         document.getElementById('borrowerForm').reset();
         await refreshDashboard();
-        alert('✅ Borrower added successfully!');
+        showToast('✅ Borrower added successfully!', 'success');
     } catch (error) {
-        alert('❌ Error: ' + error.message);
+        showToast('❌ Error: ' + error.message, 'error');
     }
 });
 
-// Borrower Form 2
+// Borrower Form 2 (Add Borrower page)
 document.getElementById('borrowerForm2').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('borrowerName2').value.trim();
@@ -403,9 +490,11 @@ document.getElementById('borrowerForm2').addEventListener('submit', async (e) =>
         await addBorrower(name, contactInfo);
         document.getElementById('borrowerForm2').reset();
         await refreshDashboard();
-        alert('✅ Borrower added successfully!');
+        showToast('✅ Borrower added successfully!', 'success');
+        // Switch to dashboard
+        showSection('dashboard');
     } catch (error) {
-        alert('❌ Error: ' + error.message);
+        showToast('❌ Error: ' + error.message, 'error');
     }
 });
 
@@ -418,7 +507,7 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
     const dateBorrowed = document.getElementById('debtDate').value;
     
     if (!borrowerId || !amount || !reason) {
-        alert('Please fill in all required fields');
+        showToast('Please fill in all required fields', 'error');
         return;
     }
     
@@ -426,9 +515,11 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
         await addDebt(borrowerId, amount, reason, dateBorrowed);
         document.getElementById('debtForm').reset();
         await refreshDashboard();
-        alert('✅ Debt logged successfully!');
+        showToast('✅ Debt logged successfully!', 'success');
+        // Switch to dashboard
+        showSection('dashboard');
     } catch (error) {
-        alert('❌ Error: ' + error.message);
+        showToast('❌ Error: ' + error.message, 'error');
     }
 });
 
@@ -440,7 +531,7 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     const notes = document.getElementById('paymentNotes').value.trim();
     
     if (!debtId || !amountPaid) {
-        alert('Please select a debt and enter the payment amount');
+        showToast('Please select a debt and enter the payment amount', 'error');
         return;
     }
     
@@ -449,13 +540,17 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
         document.getElementById('paymentForm').reset();
         document.getElementById('paymentDebt').innerHTML = '<option value="">Select Debt</option>';
         await refreshDashboard();
-        alert('✅ Payment recorded successfully!');
+        showToast('✅ Payment recorded successfully!', 'success');
+        // Switch to dashboard
+        showSection('dashboard');
     } catch (error) {
-        alert('❌ Error: ' + error.message);
+        showToast('❌ Error: ' + error.message, 'error');
     }
 });
 
-// ==================== INIT ====================
+// ========================================
+// INITIALIZE APP
+// ========================================
 
 async function initApp() {
     await refreshDashboard();

@@ -99,22 +99,12 @@ header h1 {
     z-index: 1;
 }
 
-header h1 span {
-    display: inline-block;
-    animation: pulse 2s ease-in-out infinite;
-}
-
 header p {
     font-size: 1.15rem;
     opacity: 0.9;
     margin-top: 5px;
     position: relative;
     z-index: 1;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
 }
 
 /* ----- NAVIGATION ----- */
@@ -338,6 +328,51 @@ header p {
     transform: translateY(-2px);
 }
 
+/* ----- DELETE BUTTON ----- */
+.btn-delete {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    width: auto;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    line-height: 1;
+}
+
+.btn-delete:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+    transform: scale(1.1);
+    box-shadow: none;
+}
+
+.btn-delete:active {
+    transform: scale(0.9);
+}
+
+/* ----- BADGES ----- */
+.badge-paid {
+    background: var(--success-light);
+    color: #065f46;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-unpaid {
+    background: var(--danger-light);
+    color: #991b1b;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
 /* ----- DASHBOARD ----- */
 .dashboard {
     background: white;
@@ -411,6 +446,7 @@ header p {
 .borrower-card .contact {
     color: var(--gray-500);
     font-size: 0.95rem;
+    margin-left: 10px;
 }
 
 .borrower-card .debt-count {
@@ -517,12 +553,6 @@ header p {
     margin-left: 12px;
 }
 
-.debt-item .debt-info .borrower-name {
-    font-size: 0.85rem;
-    color: var(--gray-400);
-    margin-left: 12px;
-}
-
 .debt-item .debt-amount {
     font-weight: 700;
     font-size: 1.1rem;
@@ -614,47 +644,8 @@ header p {
     text-align: right;
 }
 
-.debt-detail-header .debt-summary .total {
-    font-size: 1.6rem;
-    font-weight: 800;
-}
-
-.debt-detail-header .debt-summary .total.unpaid {
-    color: var(--danger);
-}
-
-.debt-detail-header .debt-summary .total.partial {
-    color: var(--warning);
-}
-
-.debt-detail-header .debt-summary .total.paid {
-    color: var(--success);
-}
-
-.debt-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin: 15px 0;
-}
-
-.debt-summary-grid .stat {
-    background: var(--gray-50);
-    padding: 12px;
-    border-radius: var(--radius-sm);
-    text-align: center;
-}
-
-.debt-summary-grid .stat .stat-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--gray-400);
-}
-
-.debt-summary-grid .stat .stat-value {
-    font-size: 1.2rem;
-    font-weight: 700;
+.debt-detail-header .debt-summary div {
+    font-size: 0.95rem;
 }
 
 /* ----- PAYMENT ITEMS ----- */
@@ -725,7 +716,7 @@ header p {
     margin: 0 auto;
 }
 
-/* ----- NOTIFICATIONS / TOASTS ----- */
+/* ----- TOAST NOTIFICATIONS ----- */
 .toast {
     position: fixed;
     top: 20px;
@@ -738,6 +729,7 @@ header p {
     box-shadow: var(--shadow-lg);
     animation: slideInRight 0.4s ease;
     max-width: 400px;
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .toast-success {
@@ -831,6 +823,11 @@ header p {
         grid-template-columns: 1fr 1fr;
     }
 
+    .borrower-card .card-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .debt-item {
         flex-wrap: wrap;
         gap: 8px;
@@ -847,10 +844,6 @@ header p {
 
     .debt-detail-header .debt-summary {
         text-align: center;
-    }
-
-    .debt-summary-grid {
-        grid-template-columns: 1fr 1fr;
     }
 
     .dashboard-header {
@@ -874,18 +867,17 @@ header p {
         grid-template-columns: 1fr;
     }
 
-    .debt-summary-grid {
-        grid-template-columns: 1fr;
+    .debt-item {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .debt-item .debt-info .date {
-        display: block;
-        margin-left: 0;
+    .debt-item .debt-amount {
+        margin: 4px 0;
     }
 
     .debt-item .debt-status {
-        font-size: 0.7rem;
-        padding: 2px 10px;
+        align-self: flex-start;
     }
 }
 
