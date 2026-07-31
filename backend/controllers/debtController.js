@@ -56,7 +56,7 @@ exports.getDebtsByBorrower = async (req, res) => {
     }
 };
 
-// SIMPLIFIED: Get single debt with payments
+// Get single debt by ID - FIXED VERSION
 exports.getDebtById = async (req, res) => {
     try {
         const { id } = req.params;
