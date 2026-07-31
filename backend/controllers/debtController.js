@@ -56,33 +56,33 @@ exports.getDebtsByBorrower = async (req, res) => {
     }
 };
 
-// Get single debt by ID - FIXED VERSION
+// GET single debt by ID - FIXED!
 exports.getDebtById = async (req, res) => {
     try {
         const { id } = req.params;
         
-        console.log('Fetching debt with ID:', id);
+        console.log('🔍 Fetching debt with ID:', id);
         
         // Find the debt
         const debt = await Debt.findById(id);
         
         if (!debt) {
-            console.log('Debt not found with ID:', id);
+            console.log('❌ Debt not found with ID:', id);
             return res.status(404).json({
                 success: false,
                 message: 'Debt not found'
             });
         }
         
-        console.log('Debt found:', debt);
+        console.log('✅ Debt found:', debt);
         
         // Get payments for this debt
         const payments = await Payment.find({ debtId: id });
-        console.log('Payments found:', payments.length);
+        console.log('💰 Payments found:', payments.length);
         
         const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
         
-        // Get borrower info (optional)
+        // Get borrower info
         let borrowerName = 'Unknown';
         try {
             const borrower = await Borrower.findById(debt.borrowerId);
@@ -111,7 +111,7 @@ exports.getDebtById = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error in getDebtById:', error);
+        console.error('❌ Error in getDebtById:', error);
         res.status(500).json({
             success: false,
             message: 'Server error: ' + error.message
