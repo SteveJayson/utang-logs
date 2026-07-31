@@ -1,5 +1,6 @@
 const Debt = require('../models/Debt');
 const Borrower = require('../models/Borrower');
+const Payment = require('../models/Payment');
 
 // Create a new debt
 exports.createDebt = async (req, res) => {
@@ -35,15 +36,44 @@ exports.createDebt = async (req, res) => {
     }
 };
 
-// Get single debt with full details
+// Get all debts for a borrower
+exports.getDebtsByBorrower = async (req, res) => {
+    try {
+        const { borrowerId } = req.params;
+        
+        const debts = await Debt.find({ borrowerId })
+            .sort({ dateBorrowed: -1 })
+            .populate('payments');
+            
+        const formattedDebts = debts.map(debt => {
+            const payments = debt.payments || [];
+            const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
+            return {
+                ...debt.toJSON(),
+                totalPaid,
+                remainingBalance: debt.amount - totalPaid
+            };
+        });
+        
+        res.json({
+            success: true,
+            data: formattedDebts
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+// Get single debt with full details (FIXED)
 exports.getDebtById = async (req, res) => {
     try {
         const { id } = req.params;
         
-        const debt = await Debt.findById(id)
-            .populate('payments')
-            .populate('borrowerId', 'name contactInfo');
-            
+        const debt = await Debt.findById(id);
+        
         if (!debt) {
             return res.status(404).json({
                 success: false,
@@ -51,7 +81,10 @@ exports.getDebtById = async (req, res) => {
             });
         }
         
-        const payments = debt.payments || [];
+        // Get payments separately
+        const payments = await Payment.find({ debtId: id });
+        const borrower = await Borrower.findById(debt.borrowerId);
+        
         const totalPaid = payments.reduce((sum, p) => sum + p.amountPaid, 0);
         
         res.json({
@@ -62,7 +95,11 @@ exports.getDebtById = async (req, res) => {
                 reason: debt.reason,
                 status: debt.status,
                 dateBorrowed: debt.dateBorrowed,
-                borrower: debt.borrowerId,
+                borrower: borrower ? {
+                    _id: borrower._id,
+                    name: borrower.name,
+                    contactInfo: borrower.contactInfo
+                } : null,
                 totalPaid: totalPaid,
                 remainingBalance: debt.amount - totalPaid,
                 payments: payments.map(p => ({
