@@ -23,37 +23,32 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ============================================
-// DIRECT ROUTE FOR DEBT DETAILS (FIXED)
+// IMPORT MODELS
+// ============================================
+const Debt = require('./models/Debt');
+const Payment = require('./models/Payment');
+const Borrower = require('./models/Borrower');
+
+// ============================================
+// DIRECT ROUTE FOR DEBT DETAILS - MUST BE BEFORE OTHER ROUTES!
 // ============================================
 app.get('/api/debts/:id', async (req, res) => {
     try {
-        const Debt = require('./models/Debt');
-        const Payment = require('./models/Payment');
-        
         const debtId = req.params.id;
-        console.log('🔍 Looking for debt with ID:', debtId);
+        console.log('🔍 DIRECT ROUTE: Looking for debt with ID:', debtId);
         
-        // Try to find the debt
+        // Find the debt
         const debt = await Debt.findById(debtId);
         
         if (!debt) {
-            console.log('❌ Debt not found with ID:', debtId);
-            
-            // Try to find all debts to see if the ID format is wrong
-            const allDebts = await Debt.find({}).limit(5);
-            console.log('📋 Sample debts in database:', allDebts.map(d => d._id));
-            
+            console.log('❌ DIRECT ROUTE: Debt not found with ID:', debtId);
             return res.status(404).json({
                 success: false,
-                message: 'Debt not found',
-                debug: {
-                    searchedId: debtId,
-                    sampleIds: allDebts.map(d => d._id.toString())
-                }
+                message: 'Debt not found'
             });
         }
         
-        console.log('✅ Debt found:', debt.reason);
+        console.log('✅ DIRECT ROUTE: Debt found:', debt.reason);
         
         // Get payments
         const payments = await Payment.find({ debtId: debt._id });
@@ -78,7 +73,7 @@ app.get('/api/debts/:id', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Error in debt details:', error);
+        console.error('❌ DIRECT ROUTE Error:', error);
         res.status(500).json({
             success: false,
             message: error.message
@@ -86,7 +81,9 @@ app.get('/api/debts/:id', async (req, res) => {
     }
 });
 
-// Routes
+// ============================================
+// ROUTES
+// ============================================
 const borrowerRoutes = require('./routes/borrowers');
 const debtRoutes = require('./routes/debts');
 const paymentRoutes = require('./routes/payments');
