@@ -127,8 +127,11 @@ header p {
 /* ========================================
    THEME CONTROLS
    ======================================== */
+/* ========================================
+   THEME CONTROLS
+   ======================================== */
 .theme-controls {
-    background: transparent !important;
+    background-color: transparent !important;
     padding: 20px 25px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -244,12 +247,14 @@ header p {
 
 /* ----- NAVIGATION - FIXED (no background) ----- */
 /* ----- NAVIGATION ----- */
+/* ----- NAVIGATION ----- */
+/* ----- NAVIGATION ----- */
 .nav-bar {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 25px;
-    background: transparent !important;
+    background-color: transparent !important;
     padding: 12px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -1346,21 +1351,12 @@ body {
 }
 
 /* ========================================
-   FORCE OVERRIDE FOR NAV-BAR & THEME-CONTROLS
+   FORCE OVERRIDE - Navigation Bar
    ======================================== */
 .nav-bar {
-    background: transparent !important;
+    background-color: transparent !important;
 }
 
 .theme-controls {
-    background: transparent !important;
-}
-
-/* Also make sure the nav buttons don't have white backgrounds */
-.nav-btn {
-    background: var(--gray-50) !important;
-}
-
-.nav-btn.active {
-    background: var(--primary-gradient) !important;
+    background-color: transparent !important;
 }
