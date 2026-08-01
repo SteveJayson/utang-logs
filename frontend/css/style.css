@@ -124,8 +124,11 @@ header p {
 /* ========================================
    THEME CONTROLS - FIXED (no background)
    ======================================== */
+/* ========================================
+   THEME CONTROLS
+   ======================================== */
 .theme-controls {
-    /* background: white;  ← REMOVED */
+    background: transparent !important;
     padding: 20px 25px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -240,12 +243,13 @@ header p {
 }
 
 /* ----- NAVIGATION - FIXED (no background) ----- */
+/* ----- NAVIGATION ----- */
 .nav-bar {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 25px;
-    /* background: white;  ← REMOVED */
+    background: transparent !important;
     padding: 12px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -1339,4 +1343,17 @@ header.custom-header::after {
 /* Smooth body background transition */
 body {
     transition: background-color 0.5s ease;
+}
+
+/* ========================================
+   FORCE OVERRIDE - Navigation Bar & Theme Controls
+   ======================================== */
+.nav-bar {
+    background: none !important;
+    background-color: transparent !important;
+}
+
+.theme-controls {
+    background: none !important;
+    background-color: transparent !important;
 }
