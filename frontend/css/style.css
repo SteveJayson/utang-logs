@@ -1375,3 +1375,23 @@ body {
 .nav-btn:hover {
     background: var(--gray-200) !important;
 }
+
+header h1 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 3.5rem;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+header p {
+    font-family: 'Kalam', cursive;
+    font-weight: 300;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
+    transition: color 0.4s ease, text-shadow 0.4s ease;
+}
