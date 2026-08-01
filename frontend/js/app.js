@@ -729,36 +729,47 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM
+// THEME / COLOR SYSTEM (UPDATED - DYNAMIC GRADIENT)
 // ========================================
 
-// Check if a color is dark (for text color adjustment)
-function isDarkColor(color) {
-    if (color.startsWith('#')) {
-        const hex = color.replace('#', '');
-        const r = parseInt(hex.substr(0, 2), 16);
-        const g = parseInt(hex.substr(2, 2), 16);
-        const b = parseInt(hex.substr(4, 2), 16);
-        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        return brightness < 128;
-    }
-    return false;
-}
-
-// Get header text color based on background
-function getHeaderTextColor(bgColor) {
-    if (isDarkColor(bgColor)) {
-        return '#ffffff';
-    }
-    return '#ffffff';
-}
-
-// Get header text shadow based on background
-function getHeaderTextShadow(bgColor) {
-    if (isDarkColor(bgColor)) {
-        return '0 2px 20px rgba(0,0,0,0.3), 0 0 40px rgba(0,0,0,0.2)';
-    }
-    return 'none';
+// Generate header gradient based on background color
+function getHeaderGradient(bgColor) {
+    // Default gradient (light mode)
+    const defaultGradient = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)';
+    const darkGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    const warmGradient = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+    const oceanGradient = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+    const forestGradient = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
+    const sunsetGradient = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)';
+    const purpleGradient = 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)';
+    const nightGradient = 'linear-gradient(135deg, #0c0c1d 0%, #1a1a3e 100%)';
+    const roseGradient = 'linear-gradient(135deg, #f43b47 0%, #453a94 100%)';
+    const mintGradient = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+    
+    // Map background colors to header gradients
+    const gradientMap = {
+        // Dark colors
+        '#1a1a2e': darkGradient,
+        '#0f0e17': nightGradient,
+        '#2d1b69': darkGradient,
+        '#1b3a4b': oceanGradient,
+        '#2d2d2d': darkGradient,
+        // Warm colors
+        '#fef9e7': warmGradient,
+        '#fff3e0': sunsetGradient,
+        // Green
+        '#e8f5e9': forestGradient,
+        // Blue
+        '#e3f2fd': oceanGradient,
+        // Pink
+        '#fce4ec': purpleGradient,
+        // Lavender
+        '#f3e5f5': purpleGradient,
+        // Default for light backgrounds
+        '#f1f5f9': defaultGradient,
+    };
+    
+    return gradientMap[bgColor] || defaultGradient;
 }
 
 // Load saved colors from localStorage
@@ -770,25 +781,11 @@ function loadThemeColors() {
         document.body.style.backgroundColor = savedBg;
         document.body.style.backgroundImage = 'none';
         
-        // Apply header color (same as background)
+        // Update header gradient based on background color
         const header = document.querySelector('header');
         if (header) {
-            header.style.background = savedBg;
+            header.style.background = getHeaderGradient(savedBg);
             header.classList.add('custom-header');
-            
-            const headerTitle = header.querySelector('h1');
-            const headerSub = header.querySelector('p');
-            const textColor = getHeaderTextColor(savedBg);
-            const textShadow = getHeaderTextShadow(savedBg);
-            
-            if (headerTitle) {
-                headerTitle.style.color = textColor;
-                headerTitle.style.textShadow = textShadow;
-            }
-            if (headerSub) {
-                headerSub.style.color = textColor;
-                headerSub.style.textShadow = textShadow;
-            }
         }
         
         // Update active state
@@ -818,31 +815,17 @@ function loadThemeColors() {
     }
 }
 
-// Set background color
+// Set background color (UPDATED)
 function setBgColor(color) {
     document.body.style.backgroundColor = color;
     document.body.style.backgroundImage = 'none';
     localStorage.setItem('utang_bg_color', color);
     
-    // Apply header color (same as background)
+    // Update header gradient based on background color
     const header = document.querySelector('header');
     if (header) {
-        header.style.background = color;
+        header.style.background = getHeaderGradient(color);
         header.classList.add('custom-header');
-        
-        const headerTitle = header.querySelector('h1');
-        const headerSub = header.querySelector('p');
-        const textColor = getHeaderTextColor(color);
-        const textShadow = getHeaderTextShadow(color);
-        
-        if (headerTitle) {
-            headerTitle.style.color = textColor;
-            headerTitle.style.textShadow = textShadow;
-        }
-        if (headerSub) {
-            headerSub.style.color = textColor;
-            headerSub.style.textShadow = textShadow;
-        }
     }
     
     // Update active states
@@ -874,28 +857,18 @@ function setCardColor(color) {
     }
 }
 
-// Reset background color
+// Reset background color (UPDATED)
 function resetBgColor() {
     const defaultColor = '#f1f5f9';
     document.body.style.backgroundColor = defaultColor;
     document.body.style.backgroundImage = '';
     localStorage.removeItem('utang_bg_color');
     
+    // Reset header gradient
     const header = document.querySelector('header');
     if (header) {
         header.style.background = '';
         header.classList.remove('custom-header');
-        
-        const headerTitle = header.querySelector('h1');
-        const headerSub = header.querySelector('p');
-        if (headerTitle) {
-            headerTitle.style.color = '';
-            headerTitle.style.textShadow = '';
-        }
-        if (headerSub) {
-            headerSub.style.color = '';
-            headerSub.style.textShadow = '';
-        }
     }
     
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
@@ -931,7 +904,7 @@ function resetCardColor() {
     showToast('🔄 Card color reset to default', 'info');
 }
 
-// Apply custom colors from color pickers
+// Apply custom colors from color pickers (UPDATED)
 function applyCustomColors() {
     const bgColor = document.getElementById('customBgColor').value;
     const cardColor = document.getElementById('customCardColor').value;
@@ -980,11 +953,11 @@ function saveColors() {
         }
     }
     
-    // Also save header color
+    // Also save header gradient color
     const header = document.querySelector('header');
     if (header) {
         const bg = header.style.background || getComputedStyle(header).background;
-        localStorage.setItem('utang_header_color', bg);
+        localStorage.setItem('utang_header_gradient', bg);
     }
     
     if (savedCount > 0) {
@@ -996,22 +969,25 @@ function saveColors() {
 
 // Initialize theme controls
 function initThemeControls() {
+    // Background color buttons
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const color = this.dataset.color;
             setBgColor(color);
-            showToast('🎨 Background color applied and saved!', 'info');
+            showToast('🎨 Background color applied!', 'info');
         });
     });
     
+    // Card color buttons
     document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const color = this.dataset.color;
             setCardColor(color);
-            showToast('🎨 Card color applied and saved!', 'info');
+            showToast('🎨 Card color applied!', 'info');
         });
     });
     
+    // Load saved colors
     loadThemeColors();
 }
 
