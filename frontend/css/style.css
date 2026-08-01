@@ -200,116 +200,6 @@ header p {
 
 .btn-reset-color:hover {
     background: var(--gray-300);
-
-}
-/* ========================================
-   FONTS - Handwritten Style
-   ======================================== */
-
-/* Import Google Fonts - Add to index.html head */
-/* <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Kalam:wght@300;400;700&family=Patrick+Hand&display=swap" rel="stylesheet"> */
-
-/* Header Title */
-header h1 {
-    font-family: 'Dancing Script', cursive;
-    font-weight: 700;
-    font-size: 3.5rem;
-    letter-spacing: 1px;
-    position: relative;
-    z-index: 1;
-    transition: color 0.4s ease, text-shadow 0.4s ease;
-}
-
-/* Header Subtitle */
-header p {
-    font-family: 'Kalam', cursive;
-    font-weight: 300;
-    font-size: 1.2rem;
-    letter-spacing: 0.5px;
-    position: relative;
-    z-index: 1;
-    transition: color 0.4s ease, text-shadow 0.4s ease;
-}
-
-/* ALL Headings - Quick Add Borrower, Add New Borrower, Log New Debt, Record Payment */
-.form-section h2,
-.dashboard-header h2,
-.debt-detail-header h2,
-.modal-header h2,
-.history-modal-header h2 {
-    font-family: 'Dancing Script', 'Kalam', cursive !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px !important;
-}
-
-/* Debt list title */
-.debt-list-title {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 600 !important;
-    font-size: 1rem !important;
-}
-
-/* Borrower card names */
-.borrower-card .name {
-    font-family: 'Dancing Script', 'Kalam', cursive !important;
-    font-weight: 700 !important;
-    font-size: 1.4rem !important;
-}
-
-/* Debt reason text */
-.debt-item .debt-info .reason {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 600 !important;
-}
-
-/* Navigation buttons */
-.nav-btn {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 600 !important;
-    font-size: 1rem !important;
-}
-
-/* Form labels */
-.form-group label {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 600 !important;
-    font-size: 0.95rem !important;
-}
-
-/* All buttons */
-.btn,
-.btn-primary,
-.btn-secondary,
-.btn-save-colors,
-.btn-apply-color,
-.btn-reset-color,
-.btn-delete,
-.btn-history,
-.btn-edit-debt,
-.btn-delete-debt,
-.btn-restore,
-.btn-close-modal {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 600 !important;
-}
-
-/* Debt status labels */
-.debt-item .debt-status {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 700 !important;
-}
-
-/* Payment amounts */
-.payment-item .payment-info .amount {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 700 !important;
-}
-
-/* Empty state text */
-.empty-state h3 {
-    font-family: 'Dancing Script', 'Kalam', cursive !important;
-    font-weight: 700 !important;
-    font-size: 1.5rem !important;
 }
 
 .btn-apply-color {
@@ -1487,7 +1377,7 @@ body {
 }
 
 /* ========================================
-   HEADER & FONTS - Handwritten Style
+   HANDWRITTEN FONTS - Headings & Sections
    ======================================== */
 
 /* Header Title */
@@ -1512,7 +1402,7 @@ header p {
     transition: color 0.4s ease, text-shadow 0.4s ease;
 }
 
-/* ----- ALL HEADINGS - Handwritten Font ----- */
+/* All Section Headings (Quick Add Borrower, Add New Borrower, etc.) */
 .form-section h2,
 .dashboard-header h2,
 .debt-detail-header h2,
@@ -1523,35 +1413,41 @@ header p {
     letter-spacing: 0.5px !important;
 }
 
+/* Debt list titles */
 .debt-list-title {
     font-family: 'Kalam', 'Patrick Hand', cursive !important;
     font-weight: 600 !important;
     font-size: 1rem !important;
 }
 
+/* Borrower card names */
 .borrower-card .name {
     font-family: 'Dancing Script', 'Kalam', cursive !important;
     font-weight: 700 !important;
     font-size: 1.4rem !important;
 }
 
+/* Debt item reasons */
 .debt-item .debt-info .reason {
     font-family: 'Kalam', 'Patrick Hand', cursive !important;
     font-weight: 600 !important;
 }
 
+/* Navigation buttons */
 .nav-btn {
     font-family: 'Kalam', 'Patrick Hand', cursive !important;
     font-weight: 600 !important;
     font-size: 1rem !important;
 }
 
+/* Form labels */
 .form-group label {
     font-family: 'Kalam', 'Patrick Hand', cursive !important;
     font-weight: 600 !important;
     font-size: 0.95rem !important;
 }
 
+/* Buttons */
 .btn,
 .btn-primary,
 .btn-secondary,
@@ -1560,10 +1456,4 @@ header p {
 .btn-reset-color {
     font-family: 'Kalam', 'Patrick Hand', cursive !important;
     font-weight: 600 !important;
-}
-
-/* Debt status labels */
-.debt-item .debt-status {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
-    font-weight: 700 !important;
 }
