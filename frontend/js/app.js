@@ -729,7 +729,7 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM
+// THEME / COLOR SYSTEM - ULTIMATE FIX
 // ========================================
 
 function getHeaderGradient(bgColor) {
@@ -787,8 +787,10 @@ function loadThemeColors() {
     if (savedCard) {
         const cardElements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
         cardElements.forEach(el => {
-            el.style.backgroundColor = savedCard;
+            el.style.setProperty('background-color', savedCard, 'important');
+            el.style.setProperty('background', savedCard, 'important');
         });
+        
         document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.color === savedCard);
         });
@@ -824,7 +826,8 @@ function setBgColor(color) {
 function setCardColor(color) {
     const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
     elements.forEach(el => {
-        el.style.backgroundColor = color;
+        el.style.setProperty('background-color', color, 'important');
+        el.style.setProperty('background', color, 'important');
     });
     localStorage.setItem('utang_card_color', color);
     
@@ -866,7 +869,8 @@ function resetCardColor() {
     const defaultColor = '#ffffff';
     const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
     elements.forEach(el => {
-        el.style.backgroundColor = defaultColor;
+        el.style.setProperty('background-color', defaultColor, 'important');
+        el.style.setProperty('background', defaultColor, 'important');
     });
     localStorage.removeItem('utang_card_color');
     

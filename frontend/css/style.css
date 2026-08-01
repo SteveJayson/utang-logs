@@ -1351,12 +1351,16 @@ body {
 }
 
 /* ========================================
-   FORCE OVERRIDE - Navigation Bar
+   ULTIMATE FIX - Force remove white backgrounds
    ======================================== */
-.nav-bar {
-    background-color: transparent !important;
-}
-
-.theme-controls {
+.nav-bar,
+.theme-controls,
+.borrower-card,
+.dashboard,
+.form-section,
+.debt-detail-view,
+.debt-item,
+.payment-item {
+    background: none !important;
     background-color: transparent !important;
 }
