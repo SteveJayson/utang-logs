@@ -729,8 +729,46 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM
+// THEME / COLOR SYSTEM (UPDATED)
 // ========================================
+
+// Generate header gradient based on background color
+function getHeaderGradient(bgColor) {
+    // Default gradient (light mode)
+    const defaultGradient = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)';
+    const darkGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    const warmGradient = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+    const oceanGradient = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+    const forestGradient = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
+    const sunsetGradient = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)';
+    const purpleGradient = 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)';
+    const nightGradient = 'linear-gradient(135deg, #0c0c1d 0%, #1a1a3e 100%)';
+    
+    // Map background colors to header gradients
+    const gradientMap = {
+        // Dark colors
+        '#1a1a2e': darkGradient,
+        '#0f0e17': nightGradient,
+        '#2d1b69': darkGradient,
+        '#1b3a4b': oceanGradient,
+        '#2d2d2d': darkGradient,
+        // Warm colors
+        '#fef9e7': warmGradient,
+        '#fff3e0': sunsetGradient,
+        // Green
+        '#e8f5e9': forestGradient,
+        // Blue
+        '#e3f2fd': oceanGradient,
+        // Pink
+        '#fce4ec': purpleGradient,
+        // Lavender
+        '#f3e5f5': purpleGradient,
+        // Default for light backgrounds
+        '#f1f5f9': defaultGradient,
+    };
+    
+    return gradientMap[bgColor] || defaultGradient;
+}
 
 // Load saved colors from localStorage
 function loadThemeColors() {
@@ -740,37 +778,70 @@ function loadThemeColors() {
     if (savedBg) {
         document.body.style.backgroundColor = savedBg;
         document.body.style.backgroundImage = 'none';
+        
+        // Update header gradient based on background color
+        const header = document.querySelector('header');
+        if (header) {
+            header.style.background = getHeaderGradient(savedBg);
+            header.classList.add('custom-header');
+        }
+        
         // Update active state
         document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.color === savedBg);
         });
+        
+        // Update custom color picker
+        const customBgInput = document.getElementById('customBgColor');
+        if (customBgInput) {
+            customBgInput.value = savedBg;
+        }
     }
     
     if (savedCard) {
-        document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item').forEach(el => {
+        const cardElements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
+        cardElements.forEach(el => {
             el.style.backgroundColor = savedCard;
         });
         document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.color === savedCard);
         });
+        
+        const customCardInput = document.getElementById('customCardColor');
+        if (customCardInput) {
+            customCardInput.value = savedCard;
+        }
     }
 }
 
-// Set background color
+// Set background color (UPDATED)
 function setBgColor(color) {
     document.body.style.backgroundColor = color;
     document.body.style.backgroundImage = 'none';
     localStorage.setItem('utang_bg_color', color);
     
+    // Update header gradient
+    const header = document.querySelector('header');
+    if (header) {
+        header.style.background = getHeaderGradient(color);
+        header.classList.add('custom-header');
+    }
+    
     // Update active states
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.color === color);
     });
+    
+    // Update custom color picker
+    const customBgInput = document.getElementById('customBgColor');
+    if (customBgInput) {
+        customBgInput.value = color;
+    }
 }
 
-// Set card color
+// Set card color (UPDATED)
 function setCardColor(color) {
-    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item');
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
     elements.forEach(el => {
         el.style.backgroundColor = color;
     });
@@ -780,25 +851,44 @@ function setCardColor(color) {
     document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.color === color);
     });
+    
+    // Update custom color picker
+    const customCardInput = document.getElementById('customCardColor');
+    if (customCardInput) {
+        customCardInput.value = color;
+    }
 }
 
-// Reset background color
+// Reset background color (UPDATED)
 function resetBgColor() {
     const defaultColor = '#f1f5f9';
     document.body.style.backgroundColor = defaultColor;
     document.body.style.backgroundImage = '';
     localStorage.removeItem('utang_bg_color');
     
+    // Reset header gradient
+    const header = document.querySelector('header');
+    if (header) {
+        header.style.background = '';
+        header.classList.remove('custom-header');
+    }
+    
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.color === defaultColor);
     });
+    
+    const customBgInput = document.getElementById('customBgColor');
+    if (customBgInput) {
+        customBgInput.value = defaultColor;
+    }
+    
     showToast('🔄 Background color reset to default', 'info');
 }
 
-// Reset card color
+// Reset card color (UPDATED)
 function resetCardColor() {
     const defaultColor = '#ffffff';
-    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item');
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
     elements.forEach(el => {
         el.style.backgroundColor = defaultColor;
     });
@@ -807,35 +897,38 @@ function resetCardColor() {
     document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.color === defaultColor);
     });
+    
+    const customCardInput = document.getElementById('customCardColor');
+    if (customCardInput) {
+        customCardInput.value = defaultColor;
+    }
+    
     showToast('🔄 Card color reset to default', 'info');
 }
 
-// Apply custom colors from color pickers
+// Apply custom colors from color pickers (UPDATED)
 function applyCustomColors() {
     const bgColor = document.getElementById('customBgColor').value;
     const cardColor = document.getElementById('customCardColor').value;
     
     if (bgColor) {
         setBgColor(bgColor);
-        document.getElementById('customBgColor').value = bgColor;
     }
     
     if (cardColor) {
         setCardColor(cardColor);
-        document.getElementById('customCardColor').value = cardColor;
     }
     
     showToast('🎨 Colors updated successfully!', 'success');
 }
 
-// Initialize theme controls
+// Initialize theme controls (UPDATED)
 function initThemeControls() {
     // Background color buttons
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const color = this.dataset.color;
             setBgColor(color);
-            document.getElementById('customBgColor').value = color;
             showToast('🎨 Background color updated!', 'info');
         });
     });
@@ -845,7 +938,6 @@ function initThemeControls() {
         btn.addEventListener('click', function() {
             const color = this.dataset.color;
             setCardColor(color);
-            document.getElementById('customCardColor').value = color;
             showToast('🎨 Card color updated!', 'info');
         });
     });
@@ -943,7 +1035,7 @@ async function initApp() {
     console.log('🚀 Utang Logs App Starting...');
     console.log('📡 API URL:', API_URL);
     await refreshDashboard();
-    initThemeControls();  // Initialize theme controls
+    initThemeControls();
     console.log('✅ App ready!');
 }
 

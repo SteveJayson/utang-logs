@@ -47,7 +47,7 @@ body {
     color: var(--gray-800);
     line-height: 1.7;
     min-height: 100vh;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.5s ease;
 }
 
 /* ----- CONTAINER ----- */
@@ -68,6 +68,21 @@ header {
     box-shadow: var(--shadow-lg);
     position: relative;
     overflow: hidden;
+    transition: background 0.6s ease, box-shadow 0.3s ease;
+}
+
+header.custom-header {
+    transition: background 0.6s ease;
+}
+
+header.custom-header::before {
+    opacity: 0.5;
+    transition: opacity 0.6s ease;
+}
+
+header.custom-header::after {
+    opacity: 0.3;
+    transition: opacity 0.6s ease;
 }
 
 header::before {
@@ -118,6 +133,7 @@ header p {
     box-shadow: var(--shadow);
     margin-bottom: 25px;
     border: 1px solid var(--gray-200);
+    transition: background-color 0.4s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .theme-group {
@@ -209,6 +225,7 @@ header p {
     padding: 12px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
+    transition: background-color 0.4s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .nav-btn {
@@ -275,7 +292,7 @@ header p {
     box-shadow: var(--shadow);
     margin-bottom: 25px;
     border: 1px solid var(--gray-200);
-    transition: background-color 0.3s ease, var(--transition);
+    transition: background-color 0.4s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .form-section:hover {
@@ -448,7 +465,7 @@ header p {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     border: 1px solid var(--gray-200);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.4s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .dashboard-header {
@@ -484,7 +501,7 @@ header p {
     padding: 22px 25px;
     margin-bottom: 16px;
     cursor: pointer;
-    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease;
     position: relative;
 }
 
@@ -599,7 +616,7 @@ header p {
     background: var(--gray-50);
     border-radius: var(--radius-sm);
     margin-bottom: 8px;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    transition: background-color 0.4s ease, transform 0.3s ease;
     gap: 8px;
 }
 
@@ -780,7 +797,7 @@ header p {
     box-shadow: var(--shadow-lg);
     margin-top: 20px;
     border: 2px solid var(--gray-200);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.4s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .debt-detail-view .back-btn {
@@ -835,7 +852,7 @@ header p {
     border-left: 4px solid var(--success);
     border-radius: var(--radius-sm);
     margin-bottom: 8px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.4s ease;
 }
 
 .payment-item .payment-info .amount {
