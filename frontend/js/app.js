@@ -430,6 +430,13 @@ async function addPayment(debtId, amountPaid, notes) {
 function renderBorrowers(borrowers) {
     const container = document.getElementById('borrowerList');
     
+    // ✅ UPDATE THE COUNT
+    const countElement = document.getElementById('borrowerCount');
+    if (countElement) {
+        const count = borrowers?.length || 0;
+        countElement.textContent = `${count} borrower${count !== 1 ? 's' : ''}`;
+    }
+    
     if (!borrowers || borrowers.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
