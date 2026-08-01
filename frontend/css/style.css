@@ -1423,3 +1423,10 @@ header::after {
 .mb-20 { margin-bottom: 20px; }
 .flex-center { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .gap-10 { gap: 10px; }
+
+/* ========================================
+   ADD BORROWER BUTTON - BLACK TEXT
+   ======================================== */
+.btn-primary {
+    color: #000000 !important;
+}
