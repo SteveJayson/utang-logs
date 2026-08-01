@@ -55,10 +55,10 @@ body {
 }
 
 /* ========================================
-   FONTS - Handwritten Style
+   HEADER - Cursive Font ONLY
    ======================================== */
 
-/* Header Title */
+/* Header Title - KEEPS CURSIVE FONT */
 header h1 {
     font-family: 'Dancing Script', cursive;
     font-weight: 700;
@@ -69,7 +69,7 @@ header h1 {
     transition: color 0.4s ease, text-shadow 0.4s ease;
 }
 
-/* Header Subtitle */
+/* Header Subtitle - KEEPS CURSIVE FONT */
 header p {
     font-family: 'Kalam', cursive;
     font-weight: 300;
@@ -80,46 +80,56 @@ header p {
     transition: color 0.4s ease, text-shadow 0.4s ease;
 }
 
-/* ALL Headings */
+/* ========================================
+   ALL OTHER TEXT - Normal Fonts
+   ======================================== */
+
+/* All headings - NORMAL FONT (not cursive) */
 .form-section h2,
 .dashboard-header h2,
 .debt-detail-header h2,
 .modal-header h2,
 .history-modal-header h2 {
-    font-family: 'Dancing Script', 'Kalam', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 700 !important;
-    letter-spacing: 0.5px !important;
+    letter-spacing: -0.3px !important;
 }
 
+/* Debt list title */
 .debt-list-title {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 600 !important;
     font-size: 1rem !important;
 }
 
+/* Borrower card names */
 .borrower-card .name {
-    font-family: 'Dancing Script', 'Kalam', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 700 !important;
     font-size: 1.4rem !important;
 }
 
+/* Debt reason text */
 .debt-item .debt-info .reason {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 600 !important;
 }
 
+/* Navigation buttons */
 .nav-btn {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 600 !important;
     font-size: 1rem !important;
 }
 
+/* Form labels */
 .form-group label {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 600 !important;
     font-size: 0.95rem !important;
 }
 
+/* All buttons */
 .btn,
 .btn-primary,
 .btn-secondary,
@@ -132,24 +142,39 @@ header p {
 .btn-delete-debt,
 .btn-restore,
 .btn-close-modal {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 600 !important;
 }
 
+/* Debt status labels */
 .debt-item .debt-status {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 700 !important;
 }
 
+/* Payment amounts */
 .payment-item .payment-info .amount {
-    font-family: 'Kalam', 'Patrick Hand', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 700 !important;
 }
 
+/* Empty state text */
 .empty-state h3 {
-    font-family: 'Dancing Script', 'Kalam', cursive !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     font-weight: 700 !important;
     font-size: 1.5rem !important;
+}
+
+/* Theme controls labels */
+.theme-group label {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-weight: 600 !important;
+}
+
+/* Toast notifications */
+.toast {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-weight: 600 !important;
 }
 
 /* ----- HEADER ----- */
@@ -228,7 +253,6 @@ header::after {
     font-size: 0.95rem;
     color: var(--gray-700);
     margin-bottom: 10px;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .color-options {
@@ -271,7 +295,6 @@ header::after {
     transition: var(--transition);
     width: auto;
     margin-top: 8px;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-reset-color:hover {
@@ -288,7 +311,6 @@ header::after {
     cursor: pointer;
     transition: var(--transition);
     width: auto;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-apply-color:hover {
@@ -311,7 +333,6 @@ header::after {
     cursor: pointer;
     transition: var(--transition);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-save-colors:hover {
@@ -351,7 +372,6 @@ header::after {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .nav-btn:hover {
@@ -405,7 +425,6 @@ header::after {
 }
 
 .form-section h2 {
-    font-family: 'Dancing Script', 'Kalam', cursive;
     font-weight: 700;
     font-size: 1.5rem;
     color: var(--gray-800);
@@ -413,7 +432,7 @@ header::after {
     display: flex;
     align-items: center;
     gap: 10px;
-    letter-spacing: 0.5px;
+    letter-spacing: -0.3px;
 }
 
 .form-group {
@@ -422,7 +441,6 @@ header::after {
 
 .form-group label {
     display: block;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--gray-700);
@@ -485,14 +503,13 @@ header::after {
     padding: 14px 24px;
     border: none;
     border-radius: var(--radius-sm);
-    font-family: 'Kalam', 'Patrick Hand', cursive;
     font-weight: 700;
     font-size: 1.05rem;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 6px;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
 .form-section .btn-primary {
@@ -523,7 +540,6 @@ header::after {
     justify-content: center;
     gap: 8px;
     width: 100%;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-primary {
@@ -596,7 +612,6 @@ header::after {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--gray-800);
-    font-family: 'Dancing Script', 'Kalam', cursive;
 }
 
 .dashboard-header .count {
@@ -642,7 +657,6 @@ header::after {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--gray-800);
-    font-family: 'Dancing Script', 'Kalam', cursive;
 }
 
 .borrower-card .contact {
@@ -722,7 +736,6 @@ header::after {
     margin-bottom: 10px;
     padding-bottom: 8px;
     border-bottom: 2px solid var(--gray-100);
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .debt-item {
@@ -749,7 +762,6 @@ header::after {
 .debt-item .debt-info .reason {
     font-weight: 600;
     color: var(--gray-800);
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .debt-item .debt-info .date {
@@ -785,7 +797,6 @@ header::after {
     text-transform: uppercase;
     letter-spacing: 0.3px;
     white-space: nowrap;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .status-unpaid {
@@ -824,7 +835,6 @@ header::after {
     color: var(--gray-400);
     background: var(--gray-100);
     line-height: 1;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-edit-debt:hover {
@@ -849,7 +859,6 @@ header::after {
     color: var(--gray-400);
     background: var(--gray-100);
     line-height: 1;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-delete-debt:hover {
@@ -874,7 +883,6 @@ header::after {
     color: var(--gray-400);
     background: var(--gray-100);
     line-height: 1;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-delete:hover {
@@ -899,7 +907,6 @@ header::after {
     color: var(--gray-400);
     background: var(--gray-100);
     line-height: 1;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-history:hover {
@@ -934,7 +941,6 @@ header::after {
     transition: var(--transition);
     width: auto;
     margin-bottom: 20px;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .debt-detail-view .back-btn:hover {
@@ -956,7 +962,6 @@ header::after {
 .debt-detail-header h2 {
     color: var(--gray-800);
     font-size: 1.4rem;
-    font-family: 'Dancing Script', 'Kalam', cursive;
 }
 
 .debt-detail-header .debt-summary {
@@ -984,7 +989,6 @@ header::after {
     font-weight: 700;
     color: var(--success);
     font-size: 1.1rem;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .payment-item .payment-info .date {
@@ -1029,7 +1033,6 @@ header::after {
     color: var(--gray-600);
     font-size: 1.2rem;
     margin-bottom: 8px;
-    font-family: 'Dancing Script', 'Kalam', cursive;
 }
 
 .empty-state p {
@@ -1052,7 +1055,6 @@ header::after {
     animation: slideInRight 0.4s ease;
     max-width: 400px;
     transition: opacity 0.4s ease, transform 0.4s ease;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .toast-success {
@@ -1113,7 +1115,6 @@ header::after {
 .modal-header h2 {
     font-size: 1.3rem;
     color: var(--gray-800);
-    font-family: 'Dancing Script', 'Kalam', cursive;
 }
 
 .modal-body .form-group {
@@ -1126,7 +1127,6 @@ header::after {
     font-size: 0.9rem;
     color: var(--gray-700);
     margin-bottom: 5px;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .modal-body .form-group input,
@@ -1190,7 +1190,6 @@ header::after {
 .history-modal-header h2 {
     font-size: 1.3rem;
     color: var(--gray-800);
-    font-family: 'Dancing Script', 'Kalam', cursive;
 }
 
 .history-modal-header p {
@@ -1208,7 +1207,6 @@ header::after {
     transition: var(--transition);
     width: auto;
     padding: 4px 10px;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-close-modal:hover {
@@ -1293,7 +1291,6 @@ header::after {
     transition: var(--transition);
     width: auto;
     flex-shrink: 0;
-    font-family: 'Kalam', 'Patrick Hand', cursive;
 }
 
 .btn-restore:hover {
