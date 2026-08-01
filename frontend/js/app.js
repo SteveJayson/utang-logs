@@ -729,7 +729,7 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM - ULTIMATE FIX
+// THEME / COLOR SYSTEM - COMPLETE FIX
 // ========================================
 
 function getHeaderGradient(bgColor) {
@@ -785,7 +785,7 @@ function loadThemeColors() {
     }
     
     if (savedCard) {
-        const cardElements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
+        const cardElements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn');
         cardElements.forEach(el => {
             el.style.setProperty('background-color', savedCard, 'important');
             el.style.setProperty('background', savedCard, 'important');
@@ -824,7 +824,7 @@ function setBgColor(color) {
 }
 
 function setCardColor(color) {
-    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn');
     elements.forEach(el => {
         el.style.setProperty('background-color', color, 'important');
         el.style.setProperty('background', color, 'important');
@@ -867,7 +867,7 @@ function resetBgColor() {
 
 function resetCardColor() {
     const defaultColor = '#ffffff';
-    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn');
     elements.forEach(el => {
         el.style.setProperty('background-color', defaultColor, 'important');
         el.style.setProperty('background', defaultColor, 'important');

@@ -1360,7 +1360,18 @@ body {
 .form-section,
 .debt-detail-view,
 .debt-item,
-.payment-item {
+.payment-item,
+.nav-btn {
     background: none !important;
     background-color: transparent !important;
+}
+
+/* Keep the active button gradient */
+.nav-btn.active {
+    background: var(--primary-gradient) !important;
+}
+
+/* Keep hover effect but allow color change */
+.nav-btn:hover {
+    background: var(--gray-200) !important;
 }
