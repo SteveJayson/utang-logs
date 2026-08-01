@@ -100,26 +100,44 @@ async function deleteDebt(debtId, debtReason, debtAmount) {
 }
 
 // ========================================
-// EDIT DEBT - NEW!
+// EDIT DEBT WITH MODAL - NEW
 // ========================================
 
-async function editDebt(debtId, currentAmount, currentReason, currentDate) {
-    const newAmount = prompt('Enter new amount (₱):', currentAmount);
-    if (newAmount === null) return;
+function openEditModal(debtId, currentAmount, currentReason, currentDate, currentStatus) {
+    document.getElementById('editDebtId').value = debtId;
+    document.getElementById('editAmount').value = currentAmount;
+    document.getElementById('editReason').value = currentReason;
     
-    const newReason = prompt('Enter new reason:', currentReason);
-    if (newReason === null) return;
+    if (currentDate) {
+        const date = new Date(currentDate);
+        const formattedDate = date.toISOString().split('T')[0];
+        document.getElementById('editDate').value = formattedDate;
+    }
     
-    const newDate = prompt('Enter new date (YYYY-MM-DD):', currentDate ? currentDate.split('T')[0] : '');
-    if (newDate === null) return;
+    document.getElementById('editStatus').value = currentStatus || 'Unpaid';
+    document.getElementById('editDebtModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editDebtModal').style.display = 'none';
+    document.getElementById('editDebtForm').reset();
+}
+
+async function submitEditDebt(e) {
+    e.preventDefault();
     
-    const amountNum = parseFloat(newAmount);
-    if (isNaN(amountNum) || amountNum <= 0) {
+    const debtId = document.getElementById('editDebtId').value;
+    const amount = parseFloat(document.getElementById('editAmount').value);
+    const reason = document.getElementById('editReason').value.trim();
+    const dateBorrowed = document.getElementById('editDate').value;
+    const status = document.getElementById('editStatus').value;
+    
+    if (isNaN(amount) || amount <= 0) {
         showToast('❌ Please enter a valid amount', 'error');
         return;
     }
     
-    if (!newReason.trim()) {
+    if (!reason) {
         showToast('❌ Please enter a reason', 'error');
         return;
     }
@@ -129,9 +147,10 @@ async function editDebt(debtId, currentAmount, currentReason, currentDate) {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                amount: amountNum,
-                reason: newReason.trim(),
-                dateBorrowed: newDate || undefined
+                amount: amount,
+                reason: reason,
+                dateBorrowed: dateBorrowed || undefined,
+                status: status
             })
         });
         
@@ -140,6 +159,7 @@ async function editDebt(debtId, currentAmount, currentReason, currentDate) {
             throw new Error(error.message || 'Failed to edit debt');
         }
         
+        closeEditModal();
         await refreshDashboard();
         showToast('✅ Debt updated successfully!', 'success');
         document.getElementById('debtDetailView').style.display = 'none';
@@ -148,6 +168,14 @@ async function editDebt(debtId, currentAmount, currentReason, currentDate) {
         showToast('❌ Error: ' + error.message, 'error');
     }
 }
+
+// Add event listener for edit form
+document.addEventListener('DOMContentLoaded', function() {
+    const editForm = document.getElementById('editDebtForm');
+    if (editForm) {
+        editForm.addEventListener('submit', submitEditDebt);
+    }
+});
 
 // ========================================
 // VIEW DELETE HISTORY - NEW!
@@ -496,7 +524,7 @@ async function showBorrowerDebts(borrowerId) {
                 </div>
                 <span class="debt-status status-${debt.status.toLowerCase()}">${debt.status}</span>
                 <div class="debt-actions">
-                    <button onclick="event.stopPropagation(); editDebt('${debt._id}', ${debt.amount}, '${debt.reason}', '${debt.dateBorrowed}')" 
+                    <button onclick="event.stopPropagation(); openEditModal('${debt._id}', ${debt.amount}, '${debt.reason}', '${debt.dateBorrowed}', '${debt.status}')" 
                             class="btn-edit-debt"
                             title="Edit this debt">
                         ✏️
