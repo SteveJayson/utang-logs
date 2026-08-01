@@ -430,7 +430,6 @@ async function addPayment(debtId, amountPaid, notes) {
 function renderBorrowers(borrowers) {
     const container = document.getElementById('borrowerList');
     
-    // Update the borrower count
     const countElement = document.getElementById('borrowerCount');
     if (countElement) {
         countElement.textContent = `${borrowers.length} borrower${borrowers.length !== 1 ? 's' : ''}`;
@@ -673,7 +672,7 @@ async function populateSelects() {
         const select = document.getElementById(id);
         if (!select) return;
         const currentValue = select.value;
-        select.innerHTML = '<option value="">Select Borrower</option>';
+        select.innerHTML = '<option value="">Choose a borrower...</option>';
         borrowers.forEach(borrower => {
             const option = document.createElement('option');
             option.value = borrower._id;
@@ -687,7 +686,7 @@ async function populateSelects() {
         const debtSelect = document.getElementById('paymentDebt');
         const borrowerId = this.value;
         
-        debtSelect.innerHTML = '<option value="">Select Debt</option>';
+        debtSelect.innerHTML = '<option value="">Choose a debt...</option>';
         if (borrowerId) {
             try {
                 const response = await fetch(`${API_URL}/debts/borrower/${borrowerId}`);
@@ -729,7 +728,7 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM - COMPLETE FIX
+// THEME / COLOR SYSTEM
 // ========================================
 
 function getHeaderGradient(bgColor) {
@@ -785,7 +784,7 @@ function loadThemeColors() {
     }
     
     if (savedCard) {
-        const cardElements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn');
+        const cardElements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn, .btn, .btn-primary');
         cardElements.forEach(el => {
             el.style.setProperty('background-color', savedCard, 'important');
             el.style.setProperty('background', savedCard, 'important');
@@ -824,7 +823,7 @@ function setBgColor(color) {
 }
 
 function setCardColor(color) {
-    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn');
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn, .btn, .btn-primary');
     elements.forEach(el => {
         el.style.setProperty('background-color', color, 'important');
         el.style.setProperty('background', color, 'important');
@@ -867,7 +866,7 @@ function resetBgColor() {
 
 function resetCardColor() {
     const defaultColor = '#ffffff';
-    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn');
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar, .nav-btn, .btn, .btn-primary');
     elements.forEach(el => {
         el.style.setProperty('background-color', defaultColor, 'important');
         el.style.setProperty('background', defaultColor, 'important');
@@ -1035,7 +1034,7 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     try {
         await addPayment(debtId, amountPaid, notes);
         document.getElementById('paymentForm').reset();
-        document.getElementById('paymentDebt').innerHTML = '<option value="">Select Debt</option>';
+        document.getElementById('paymentDebt').innerHTML = '<option value="">Choose a debt...</option>';
         await refreshDashboard();
         showToast('✅ Payment recorded successfully!', 'success');
         showSection('dashboard');

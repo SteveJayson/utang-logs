@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Utang Logs - Debt Tracker</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Google Fonts for Handwritten Style -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=Shadows+Into+Light&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -15,70 +16,70 @@
         </header>
 
         <!-- ============================================ -->
-<!-- THEME CONTROLS                               -->
-<!-- ============================================ -->
-<div class="theme-controls">
-    <div class="theme-group">
-        <label>🎨 Background Color</label>
-        <div class="color-options" id="bgColorOptions">
-            <button class="color-btn active" data-color="#f1f5f9" style="background:#f1f5f9;" title="Default Light"></button>
-            <button class="color-btn" data-color="#1a1a2e" style="background:#1a1a2e;" title="Dark"></button>
-            <button class="color-btn" data-color="#0f0e17" style="background:#0f0e17;" title="Dark Blue"></button>
-            <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;" title="Purple Night"></button>
-            <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;" title="Deep Ocean"></button>
-            <button class="color-btn" data-color="#2d2d2d" style="background:#2d2d2d;" title="Dark Gray"></button>
-            <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;" title="Warm Cream"></button>
-            <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;" title="Soft Green"></button>
-            <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;" title="Peach"></button>
-            <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;" title="Sky Blue"></button>
-            <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;" title="Soft Pink"></button>
-            <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;" title="Lavender"></button>
-        </div>
-        <button onclick="resetBgColor()" class="btn-reset-color">↺ Reset</button>
-    </div>
+        <!-- THEME CONTROLS                               -->
+        <!-- ============================================ -->
+        <div class="theme-controls">
+            <div class="theme-group">
+                <label>🎨 Background Color</label>
+                <div class="color-options" id="bgColorOptions">
+                    <button class="color-btn active" data-color="#f1f5f9" style="background:#f1f5f9;" title="Default Light"></button>
+                    <button class="color-btn" data-color="#1a1a2e" style="background:#1a1a2e;" title="Dark"></button>
+                    <button class="color-btn" data-color="#0f0e17" style="background:#0f0e17;" title="Dark Blue"></button>
+                    <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;" title="Purple Night"></button>
+                    <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;" title="Deep Ocean"></button>
+                    <button class="color-btn" data-color="#2d2d2d" style="background:#2d2d2d;" title="Dark Gray"></button>
+                    <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;" title="Warm Cream"></button>
+                    <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;" title="Soft Green"></button>
+                    <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;" title="Peach"></button>
+                    <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;" title="Sky Blue"></button>
+                    <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;" title="Soft Pink"></button>
+                    <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;" title="Lavender"></button>
+                </div>
+                <button onclick="resetBgColor()" class="btn-reset-color">↺ Reset</button>
+            </div>
 
-    <div class="theme-group">
-        <label>📋 Card Background Color</label>
-        <div class="color-options" id="cardColorOptions">
-            <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;border:2px solid #ddd;" title="White"></button>
-            <button class="color-btn" data-color="#f8f9fa" style="background:#f8f9fa;border:2px solid #ddd;" title="Light Gray"></button>
-            <button class="color-btn" data-color="#1e1e2e" style="background:#1e1e2e;border:2px solid #ddd;" title="Dark Card"></button>
-            <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;border:2px solid #ddd;" title="Purple"></button>
-            <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;border:2px solid #ddd;" title="Ocean"></button>
-            <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;border:2px solid #ddd;" title="Cream"></button>
-            <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;border:2px solid #ddd;" title="Green"></button>
-            <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;border:2px solid #ddd;" title="Peach"></button>
-            <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;border:2px solid #ddd;" title="Sky Blue"></button>
-            <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;border:2px solid #ddd;" title="Pink"></button>
-            <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;border:2px solid #ddd;" title="Lavender"></button>
-            <button class="color-btn" data-color="#fff9c4" style="background:#fff9c4;border:2px solid #ddd;" title="Light Yellow"></button>
-        </div>
-        <button onclick="resetCardColor()" class="btn-reset-color">↺ Reset</button>
-    </div>
+            <div class="theme-group">
+                <label>📋 Card Background Color</label>
+                <div class="color-options" id="cardColorOptions">
+                    <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;border:2px solid #ddd;" title="White"></button>
+                    <button class="color-btn" data-color="#f8f9fa" style="background:#f8f9fa;border:2px solid #ddd;" title="Light Gray"></button>
+                    <button class="color-btn" data-color="#1e1e2e" style="background:#1e1e2e;border:2px solid #ddd;" title="Dark Card"></button>
+                    <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;border:2px solid #ddd;" title="Purple"></button>
+                    <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;border:2px solid #ddd;" title="Ocean"></button>
+                    <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;border:2px solid #ddd;" title="Cream"></button>
+                    <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;border:2px solid #ddd;" title="Green"></button>
+                    <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;border:2px solid #ddd;" title="Peach"></button>
+                    <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;border:2px solid #ddd;" title="Sky Blue"></button>
+                    <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;border:2px solid #ddd;" title="Pink"></button>
+                    <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;border:2px solid #ddd;" title="Lavender"></button>
+                    <button class="color-btn" data-color="#fff9c4" style="background:#fff9c4;border:2px solid #ddd;" title="Light Yellow"></button>
+                </div>
+                <button onclick="resetCardColor()" class="btn-reset-color">↺ Reset</button>
+            </div>
 
-    <!-- Custom Color Picker -->
-    <div class="theme-group" style="border-top:1px solid var(--gray-200);padding-top:15px;margin-top:10px;">
-        <label>🎨 Custom Color</label>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <input type="color" id="customBgColor" value="#f1f5f9" style="width:50px;height:50px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;">
-            <span style="font-size:0.85rem;color:var(--gray-500);">Background</span>
-            <input type="color" id="customCardColor" value="#ffffff" style="width:50px;height:50px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;margin-left:10px;">
-            <span style="font-size:0.85rem;color:var(--gray-500);">Cards</span>
-            <button onclick="applyCustomColors()" class="btn-apply-color">Apply Colors</button>
-        </div>
-    </div>
+            <!-- Custom Color Picker -->
+            <div class="theme-group" style="border-top:1px solid var(--gray-200);padding-top:15px;margin-top:10px;">
+                <label>🎨 Custom Color</label>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <input type="color" id="customBgColor" value="#f1f5f9" style="width:50px;height:50px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;">
+                    <span style="font-size:0.85rem;color:var(--gray-500);">Background</span>
+                    <input type="color" id="customCardColor" value="#ffffff" style="width:50px;height:50px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;margin-left:10px;">
+                    <span style="font-size:0.85rem;color:var(--gray-500);">Cards</span>
+                    <button onclick="applyCustomColors()" class="btn-apply-color">Apply Colors</button>
+                </div>
+            </div>
 
-    <!-- SAVE BUTTON -->
-    <div class="theme-group" style="border-top:2px solid #10b981;padding-top:15px;margin-top:10px;">
-        <button onclick="saveColors()" class="btn-save-colors">
-            💾 Save Colors Permanently
-        </button>
-        <p style="font-size:0.8rem;color:var(--gray-400);margin-top:5px;">
-            ⚡ Colors are saved automatically when you click a color. 
-            Click Save to ensure they persist after refresh.
-        </p>
-    </div>
-</div>
+            <!-- SAVE BUTTON -->
+            <div class="theme-group" style="border-top:2px solid #10b981;padding-top:15px;margin-top:10px;">
+                <button onclick="saveColors()" class="btn-save-colors">
+                    💾 Save Colors Permanently
+                </button>
+                <p style="font-size:0.8rem;color:var(--gray-400);margin-top:5px;">
+                    ⚡ Colors are saved automatically when you click a color. 
+                    Click Save to ensure they persist after refresh.
+                </p>
+            </div>
+        </div>
 
         <!-- Navigation -->
         <nav class="nav-bar">
@@ -102,15 +103,18 @@
         <div id="sectionDashboard" class="section active">
             <!-- Quick Add Borrower -->
             <section class="form-section">
-                <h2>Quick Add Borrower</h2>
+                <h2>📋 Quick Add Borrower</h2>
                 <form id="borrowerForm">
                     <div class="form-group">
-                        <input type="text" id="borrowerName" placeholder="Borrower Name" required>
+                        <label>Borrower Name</label>
+                        <input type="text" id="borrowerName" placeholder="Enter full name" required>
                     </div>
                     <div class="form-group">
-                        <input type="text" id="borrowerContact" placeholder="Contact Info (optional)">
+                        <label>Contact Info</label>
+                        <input type="text" id="borrowerContact" placeholder="Phone number or email (optional)">
+                        <span class="hint">📱 Optional - for reference only</span>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Borrower</button>
+                    <button type="submit" class="btn btn-primary">➕ Add Borrower</button>
                 </form>
             </section>
 
@@ -140,8 +144,9 @@
                     <div class="form-group">
                         <label>Contact Info</label>
                         <input type="text" id="borrowerContact2" placeholder="Phone number or email (optional)">
+                        <span class="hint">📱 Optional - for reference only</span>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Borrower</button>
+                    <button type="submit" class="btn btn-primary">➕ Add Borrower</button>
                 </form>
             </section>
         </div>
@@ -156,22 +161,24 @@
                     <div class="form-group">
                         <label>Select Borrower</label>
                         <select id="debtBorrower" required>
-                            <option value="">Select Borrower</option>
+                            <option value="">Choose a borrower...</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Amount (₱)</label>
-                        <input type="number" id="debtAmount" placeholder="0.00" required step="0.01">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Amount (₱)</label>
+                            <input type="number" id="debtAmount" placeholder="0.00" required step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Date Borrowed</label>
+                            <input type="date" id="debtDate">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Reason/Item</label>
+                        <label>Reason / Item</label>
                         <input type="text" id="debtReason" placeholder="What was borrowed?" required>
                     </div>
-                    <div class="form-group">
-                        <label>Date Borrowed</label>
-                        <input type="date" id="debtDate">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Log Debt</button>
+                    <button type="submit" class="btn btn-primary">📝 Log Debt</button>
                 </form>
             </section>
         </div>
@@ -186,24 +193,26 @@
                     <div class="form-group">
                         <label>Select Borrower</label>
                         <select id="paymentBorrower" required>
-                            <option value="">Select Borrower</option>
+                            <option value="">Choose a borrower...</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Select Debt</label>
                         <select id="paymentDebt" required>
-                            <option value="">Select Debt</option>
+                            <option value="">Choose a debt...</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Amount Paid (₱)</label>
-                        <input type="number" id="paymentAmount" placeholder="0.00" required step="0.01">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Amount Paid (₱)</label>
+                            <input type="number" id="paymentAmount" placeholder="0.00" required step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <input type="text" id="paymentNotes" placeholder="Reference (optional)">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Notes (optional)</label>
-                        <input type="text" id="paymentNotes" placeholder="Payment reference or notes">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Record Payment</button>
+                    <button type="submit" class="btn btn-primary">💾 Record Payment</button>
                 </form>
             </section>
         </div>
