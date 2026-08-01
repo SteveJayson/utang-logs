@@ -1,9 +1,7 @@
 /* ========================================
    UTANG LOGS - MODERN THEME
-   Clean, accessible, and beautiful
    ======================================== */
 
-/* ----- RESET & BASE ----- */
 * {
     margin: 0;
     padding: 0;
@@ -11,7 +9,6 @@
 }
 
 :root {
-    /* Color Palette */
     --primary: #4f46e5;
     --primary-dark: #4338ca;
     --primary-light: #818cf8;
@@ -50,7 +47,6 @@ body {
     transition: background-color 0.5s ease;
 }
 
-/* ----- CONTAINER ----- */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -126,9 +122,10 @@ header p {
 }
 
 /* ========================================
-   THEME CONTROLS
+   THEME CONTROLS - FIXED (no background)
    ======================================== */
 .theme-controls {
+    /* background: white;  ← REMOVED */
     padding: 20px 25px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -242,12 +239,13 @@ header p {
     transform: translateY(0);
 }
 
-/* ----- NAVIGATION ----- */
+/* ----- NAVIGATION - FIXED (no background) ----- */
 .nav-bar {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 25px;
+    /* background: white;  ← REMOVED */
     padding: 12px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -300,14 +298,8 @@ header p {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ----- FORM SECTIONS ----- */
@@ -711,7 +703,7 @@ header p {
 }
 
 /* ========================================
-   DEBT ACTIONS (Edit & Delete buttons)
+   DEBT ACTIONS
    ======================================== */
 .debt-actions {
     display: flex;
@@ -966,14 +958,8 @@ header p {
 }
 
 @keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 /* ========================================
@@ -1234,235 +1220,64 @@ header p {
    RESPONSIVE
    ======================================== */
 @media (max-width: 768px) {
-    .container {
-        padding: 12px;
-    }
-
-    header {
-        padding: 25px 20px;
-    }
-
-    header h1 {
-        font-size: 2rem;
-    }
-
-    header p {
-        font-size: 1rem;
-    }
-
-    .nav-bar {
-        flex-direction: column;
-        padding: 10px;
-        gap: 8px;
-    }
-
-    .nav-btn {
-        min-width: 100%;
-        justify-content: center;
-        padding: 10px 14px;
-        font-size: 0.9rem;
-    }
-
-    .form-section {
-        padding: 20px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-
-    .borrower-card {
-        padding: 16px 18px;
-    }
-
-    .borrower-card .details {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .borrower-card .card-top {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .debt-item {
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .debt-item .debt-info {
-        flex: 1 1 100%;
-        order: 1;
-    }
-
-    .debt-item .debt-amount {
-        order: 2;
-        margin: 0 10px 0 0;
-    }
-
-    .debt-item .debt-status {
-        order: 3;
-    }
-
-    .debt-actions {
-        order: 4;
-        margin-left: auto;
-    }
-
-    .debt-detail-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .debt-detail-header .debt-summary {
-        text-align: center;
-    }
-
-    .dashboard-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 8px;
-    }
-
-    .toast {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-        font-size: 0.9rem;
-        padding: 14px 18px;
-    }
-
-    /* Theme controls responsive */
-    .theme-controls {
-        padding: 15px;
-    }
-
-    .color-btn {
-        width: 30px;
-        height: 30px;
-    }
-
-    .theme-group label {
-        font-size: 0.85rem;
-    }
-
-    .btn-apply-color {
-        width: 100%;
-        margin-top: 8px;
-    }
-
-    /* History modal responsive */
-    .history-item {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .history-item .history-info {
-        flex: 1 1 100%;
-    }
-
-    .btn-restore {
-        width: 100%;
-    }
-
-    .history-modal-content {
-        width: 95%;
-        max-height: 90vh;
-    }
-
-    .history-modal-header {
-        flex-wrap: wrap;
-    }
-
-    .btn-close-modal {
-        font-size: 1.2rem;
-    }
+    .container { padding: 12px; }
+    header { padding: 25px 20px; }
+    header h1 { font-size: 2rem; }
+    header p { font-size: 1rem; }
+    .nav-bar { flex-direction: column; padding: 10px; gap: 8px; }
+    .nav-btn { min-width: 100%; justify-content: center; padding: 10px 14px; font-size: 0.9rem; }
+    .form-section { padding: 20px; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .borrower-card { padding: 16px 18px; }
+    .borrower-card .details { grid-template-columns: 1fr 1fr; }
+    .borrower-card .card-top { flex-direction: column; align-items: stretch; }
+    .debt-item { flex-wrap: wrap; gap: 6px; }
+    .debt-item .debt-info { flex: 1 1 100%; order: 1; }
+    .debt-item .debt-amount { order: 2; margin: 0 10px 0 0; }
+    .debt-item .debt-status { order: 3; }
+    .debt-actions { order: 4; margin-left: auto; }
+    .debt-detail-header { flex-direction: column; text-align: center; }
+    .debt-detail-header .debt-summary { text-align: center; }
+    .dashboard-header { flex-direction: column; text-align: center; gap: 8px; }
+    .toast { top: 10px; right: 10px; left: 10px; max-width: none; font-size: 0.9rem; padding: 14px 18px; }
+    .theme-controls { padding: 15px; }
+    .color-btn { width: 30px; height: 30px; }
+    .theme-group label { font-size: 0.85rem; }
+    .btn-apply-color { width: 100%; margin-top: 8px; }
+    .history-item { flex-wrap: wrap; gap: 8px; }
+    .history-item .history-info { flex: 1 1 100%; }
+    .btn-restore { width: 100%; }
+    .history-modal-content { width: 95%; max-height: 90vh; }
+    .history-modal-header { flex-wrap: wrap; }
+    .btn-close-modal { font-size: 1.2rem; }
 }
 
 @media (max-width: 480px) {
-    .borrower-card .details {
-        grid-template-columns: 1fr;
-    }
-
-    .debt-item {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .debt-item .debt-amount {
-        margin: 4px 0;
-    }
-
-    .debt-item .debt-status {
-        align-self: flex-start;
-    }
-
-    .debt-actions {
-        align-self: flex-start;
-        margin-left: 0;
-    }
-
-    .modal-content {
-        width: 95%;
-        max-height: 95vh;
-    }
-
-    .modal-body {
-        padding: 16px;
-    }
-
-    .modal-header {
-        padding: 14px 16px;
-    }
-
+    .borrower-card .details { grid-template-columns: 1fr; }
+    .debt-item { flex-direction: column; align-items: stretch; }
+    .debt-item .debt-amount { margin: 4px 0; }
+    .debt-item .debt-status { align-self: flex-start; }
+    .debt-actions { align-self: flex-start; margin-left: 0; }
+    .modal-content { width: 95%; max-height: 95vh; }
+    .modal-body { padding: 16px; }
+    .modal-header { padding: 14px 16px; }
     .history-item .history-amount,
     .history-item .history-date,
     .history-item .history-deleted,
-    .history-item .history-borrower {
-        display: block;
-        margin-left: 0;
-        margin-top: 4px;
-    }
+    .history-item .history-borrower { display: block; margin-left: 0; margin-top: 4px; }
 }
 
 /* ========================================
    UTILITY HELPERS
    ======================================== */
-.text-center {
-    text-align: center;
-}
-
-.text-muted {
-    color: var(--gray-500);
-}
-
-.mt-10 {
-    margin-top: 10px;
-}
-
-.mt-20 {
-    margin-top: 20px;
-}
-
-.mb-10 {
-    margin-bottom: 10px;
-}
-
-.mb-20 {
-    margin-bottom: 20px;
-}
-
-.flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.gap-10 {
-    gap: 10px;
-}
+.text-center { text-align: center; }
+.text-muted { color: var(--gray-500); }
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-20 { margin-bottom: 20px; }
+.flex-center { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.gap-10 { gap: 10px; }
 
 /* ========================================
    SAVE COLORS BUTTON
