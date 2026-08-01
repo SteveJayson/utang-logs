@@ -328,7 +328,71 @@ header p {
     transform: translateY(-2px);
 }
 
-/* ----- DELETE DEBT BUTTON ----- */
+/* ========================================
+   DELETE BUTTON (Borrower)
+   ======================================== */
+.btn-delete {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    width: auto;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    line-height: 1;
+}
+
+.btn-delete:hover {
+    background: var(--danger-light);
+    color: var(--danger);
+    transform: scale(1.1);
+    box-shadow: none;
+}
+
+.btn-delete:active {
+    transform: scale(0.9);
+}
+
+/* ========================================
+   EDIT DEBT BUTTON
+   ======================================== */
+.debt-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.btn-edit-debt {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    width: auto;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    line-height: 1;
+}
+
+.btn-edit-debt:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    transform: scale(1.1);
+    box-shadow: none;
+}
+
+.btn-edit-debt:active {
+    transform: scale(0.9);
+}
+
+/* ========================================
+   DELETE DEBT BUTTON
+   ======================================== */
 .btn-delete-debt {
     background: none;
     border: none;
@@ -341,7 +405,6 @@ header p {
     color: var(--gray-400);
     background: var(--gray-100);
     line-height: 1;
-    margin-left: 8px;
 }
 
 .btn-delete-debt:hover {
@@ -355,7 +418,196 @@ header p {
     transform: scale(0.9);
 }
 
-/* Make debt item flex layout work with delete button */
+/* ========================================
+   HISTORY BUTTON
+   ======================================== */
+.btn-history {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    width: auto;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    line-height: 1;
+}
+
+.btn-history:hover {
+    background: var(--warning-light);
+    color: var(--warning);
+    transform: scale(1.1);
+    box-shadow: none;
+}
+
+/* ========================================
+   HISTORY MODAL
+   ======================================== */
+.history-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+.history-modal-content {
+    background: white;
+    border-radius: var(--radius);
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.history-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 2px solid var(--gray-100);
+    background: var(--gray-50);
+}
+
+.history-modal-header h2 {
+    font-size: 1.3rem;
+    color: var(--gray-800);
+}
+
+.history-modal-header p {
+    font-size: 0.9rem;
+    color: var(--gray-500);
+    margin-top: 2px;
+}
+
+.btn-close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-400);
+    transition: var(--transition);
+    width: auto;
+    padding: 4px 10px;
+}
+
+.btn-close-modal:hover {
+    color: var(--gray-800);
+    transform: rotate(90deg);
+}
+
+.history-modal-body {
+    padding: 20px 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    border-left: 4px solid var(--danger);
+    gap: 10px;
+}
+
+.history-item .history-info {
+    flex: 1;
+}
+
+.history-item .history-info strong {
+    color: var(--gray-800);
+}
+
+.history-item .history-amount {
+    font-weight: 700;
+    color: var(--danger);
+    margin-left: 12px;
+}
+
+.history-item .history-date {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-left: 12px;
+}
+
+.history-item .history-deleted {
+    font-size: 0.8rem;
+    color: var(--gray-400);
+    margin-left: 12px;
+}
+
+.history-item .history-borrower {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-left: 12px;
+}
+
+.history-item .history-restored {
+    font-size: 0.8rem;
+    color: var(--success);
+    margin-left: 12px;
+    font-weight: 600;
+}
+
+.history-item .history-status {
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 12px;
+}
+
+.btn-restore {
+    padding: 6px 14px;
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    width: auto;
+    flex-shrink: 0;
+}
+
+.btn-restore:hover {
+    background: #059669;
+    transform: scale(1.05);
+}
+
+.btn-restore:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   DEBT ITEMS (Updated with actions)
+   ======================================== */
 .debt-item {
     display: flex;
     justify-content: space-between;
@@ -368,38 +620,73 @@ header p {
     gap: 8px;
 }
 
+.debt-item:hover {
+    background: var(--gray-100);
+}
+
 .debt-item .debt-info {
     flex: 1;
     cursor: pointer;
 }
 
-/* Responsive for mobile */
-@media (max-width: 768px) {
-    .debt-item {
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-    
-    .debt-item .debt-info {
-        flex: 1 1 100%;
-        order: 1;
-    }
-    
-    .debt-item .debt-amount {
-        order: 2;
-    }
-    
-    .debt-item .debt-status {
-        order: 3;
-    }
-    
-    .btn-delete-debt {
-        order: 4;
-        margin-left: auto;
-    }
+.debt-item .debt-info .reason {
+    font-weight: 600;
+    color: var(--gray-800);
 }
 
-/* ----- BADGES ----- */
+.debt-item .debt-info .date {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-left: 12px;
+}
+
+.debt-item .debt-amount {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0 15px;
+    white-space: nowrap;
+}
+
+.debt-item .debt-amount.unpaid {
+    color: var(--danger);
+}
+
+.debt-item .debt-amount.partial {
+    color: var(--warning);
+}
+
+.debt-item .debt-amount.paid {
+    color: var(--success);
+}
+
+.debt-item .debt-status {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.status-unpaid {
+    background: var(--danger-light);
+    color: #991b1b;
+}
+
+.status-partial {
+    background: var(--warning-light);
+    color: #92400e;
+}
+
+.status-paid {
+    background: var(--success-light);
+    color: #065f46;
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
 .badge-paid {
     background: var(--success-light);
     color: #065f46;
@@ -418,7 +705,9 @@ header p {
     font-weight: 600;
 }
 
-/* ----- DASHBOARD ----- */
+/* ========================================
+   DASHBOARD
+   ======================================== */
 .dashboard {
     background: white;
     padding: 30px;
@@ -452,7 +741,9 @@ header p {
     color: var(--gray-600);
 }
 
-/* ----- BORROWER CARDS ----- */
+/* ========================================
+   BORROWER CARDS
+   ======================================== */
 .borrower-card {
     background: white;
     border: 2px solid var(--gray-200);
@@ -551,7 +842,9 @@ header p {
     border-top: 1px dashed var(--gray-200);
 }
 
-/* ----- DEBT ITEMS ----- */
+/* ========================================
+   DEBT LIST
+   ======================================== */
 .debt-list {
     margin-top: 15px;
 }
@@ -565,83 +858,9 @@ header p {
     border-bottom: 2px solid var(--gray-100);
 }
 
-.debt-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    background: var(--gray-50);
-    border-radius: var(--radius-sm);
-    margin-bottom: 8px;
-    transition: var(--transition);
-    cursor: pointer;
-    border-left: 4px solid transparent;
-}
-
-.debt-item:hover {
-    background: var(--gray-100);
-    transform: translateX(4px);
-}
-
-.debt-item .debt-info {
-    flex: 1;
-}
-
-.debt-item .debt-info .reason {
-    font-weight: 600;
-    color: var(--gray-800);
-}
-
-.debt-item .debt-info .date {
-    font-size: 0.85rem;
-    color: var(--gray-500);
-    margin-left: 12px;
-}
-
-.debt-item .debt-amount {
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin: 0 15px;
-}
-
-.debt-item .debt-amount.unpaid {
-    color: var(--danger);
-}
-
-.debt-item .debt-amount.partial {
-    color: var(--warning);
-}
-
-.debt-item .debt-amount.paid {
-    color: var(--success);
-}
-
-.debt-item .debt-status {
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-}
-
-.status-unpaid {
-    background: var(--danger-light);
-    color: #991b1b;
-}
-
-.status-partial {
-    background: var(--warning-light);
-    color: #92400e;
-}
-
-.status-paid {
-    background: var(--success-light);
-    color: #065f46;
-}
-
-/* ----- DEBT DETAIL VIEW ----- */
+/* ========================================
+   DEBT DETAIL VIEW
+   ======================================== */
 .debt-detail-view {
     background: white;
     padding: 30px;
@@ -693,7 +912,9 @@ header p {
     font-size: 0.95rem;
 }
 
-/* ----- PAYMENT ITEMS ----- */
+/* ========================================
+   PAYMENT ITEMS
+   ======================================== */
 .payment-item {
     display: flex;
     justify-content: space-between;
@@ -736,7 +957,9 @@ header p {
     margin-bottom: 10px;
 }
 
-/* ----- EMPTY STATE ----- */
+/* ========================================
+   EMPTY STATE
+   ======================================== */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -761,7 +984,9 @@ header p {
     margin: 0 auto;
 }
 
-/* ----- TOAST NOTIFICATIONS ----- */
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
 .toast {
     position: fixed;
     top: 20px;
@@ -800,7 +1025,9 @@ header p {
     }
 }
 
-/* ----- SCROLLBAR ----- */
+/* ========================================
+   SCROLLBAR
+   ======================================== */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -820,7 +1047,9 @@ header p {
     background: var(--gray-400);
 }
 
-/* ----- RESPONSIVE ----- */
+/* ========================================
+   RESPONSIVE
+   ======================================== */
 @media (max-width: 768px) {
     .container {
         padding: 12px;
@@ -875,11 +1104,26 @@ header p {
 
     .debt-item {
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 6px;
+    }
+
+    .debt-item .debt-info {
+        flex: 1 1 100%;
+        order: 1;
     }
 
     .debt-item .debt-amount {
+        order: 2;
         margin: 0 10px 0 0;
+    }
+
+    .debt-item .debt-status {
+        order: 3;
+    }
+
+    .debt-actions {
+        order: 4;
+        margin-left: auto;
     }
 
     .debt-detail-header {
@@ -905,6 +1149,33 @@ header p {
         font-size: 0.9rem;
         padding: 14px 18px;
     }
+
+    /* History modal responsive */
+    .history-item {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .history-item .history-info {
+        flex: 1 1 100%;
+    }
+
+    .btn-restore {
+        width: 100%;
+    }
+
+    .history-modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .history-modal-header {
+        flex-wrap: wrap;
+    }
+
+    .btn-close-modal {
+        font-size: 1.2rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -924,33 +1195,56 @@ header p {
     .debt-item .debt-status {
         align-self: flex-start;
     }
+
+    .debt-actions {
+        align-self: flex-start;
+        margin-left: 0;
+    }
+
+    .history-item .history-amount,
+    .history-item .history-date,
+    .history-item .history-deleted,
+    .history-item .history-borrower {
+        display: block;
+        margin-left: 0;
+        margin-top: 4px;
+    }
 }
 
-/* ----- UTILITY HELPERS ----- */
+/* ========================================
+   UTILITY HELPERS
+   ======================================== */
 .text-center {
     text-align: center;
 }
+
 .text-muted {
     color: var(--gray-500);
 }
+
 .mt-10 {
     margin-top: 10px;
 }
+
 .mt-20 {
     margin-top: 20px;
 }
+
 .mb-10 {
     margin-bottom: 10px;
 }
+
 .mb-20 {
     margin-bottom: 20px;
 }
+
 .flex-center {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
 }
+
 .gap-10 {
     gap: 10px;
 }
