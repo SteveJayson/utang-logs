@@ -1346,14 +1346,21 @@ body {
 }
 
 /* ========================================
-   FORCE OVERRIDE - Navigation Bar & Theme Controls
+   FORCE OVERRIDE FOR NAV-BAR & THEME-CONTROLS
    ======================================== */
 .nav-bar {
-    background: none !important;
-    background-color: transparent !important;
+    background: transparent !important;
 }
 
 .theme-controls {
-    background: none !important;
-    background-color: transparent !important;
+    background: transparent !important;
+}
+
+/* Also make sure the nav buttons don't have white backgrounds */
+.nav-btn {
+    background: var(--gray-50) !important;
+}
+
+.nav-btn.active {
+    background: var(--primary-gradient) !important;
 }
