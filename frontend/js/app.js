@@ -729,7 +729,8 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM (UPDATED)
+// // ========================================
+// THEME / COLOR SYSTEM (UPDATED WITH HEADER TEXT)
 // ========================================
 
 // Generate header gradient based on background color
@@ -743,6 +744,8 @@ function getHeaderGradient(bgColor) {
     const sunsetGradient = 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)';
     const purpleGradient = 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)';
     const nightGradient = 'linear-gradient(135deg, #0c0c1d 0%, #1a1a3e 100%)';
+    const roseGradient = 'linear-gradient(135deg, #f43b47 0%, #453a94 100%)';
+    const mintGradient = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
     
     // Map background colors to header gradients
     const gradientMap = {
@@ -770,6 +773,53 @@ function getHeaderGradient(bgColor) {
     return gradientMap[bgColor] || defaultGradient;
 }
 
+// Check if a color is dark (for text color adjustment)
+function isDarkColor(color) {
+    // If it's a hex color
+    if (color.startsWith('#')) {
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    }
+    return false;
+}
+
+// Get header text color based on background
+function getHeaderTextColor(bgColor) {
+    // Dark backgrounds get white text with glow
+    const darkBgColors = ['#1a1a2e', '#0f0e17', '#2d1b69', '#1b3a4b', '#2d2d2d'];
+    
+    if (darkBgColors.includes(bgColor)) {
+        return 'rgba(255,255,255,1)';
+    }
+    
+    // For custom dark colors, check brightness
+    if (isDarkColor(bgColor)) {
+        return 'rgba(255,255,255,1)';
+    }
+    
+    // Light backgrounds get white text (default)
+    return 'rgba(255,255,255,1)';
+}
+
+// Get header text shadow based on background
+function getHeaderTextShadow(bgColor) {
+    const darkBgColors = ['#1a1a2e', '#0f0e17', '#2d1b69', '#1b3a4b', '#2d2d2d'];
+    
+    if (darkBgColors.includes(bgColor)) {
+        return '0 2px 20px rgba(0,0,0,0.3), 0 0 40px rgba(0,0,0,0.2)';
+    }
+    
+    if (isDarkColor(bgColor)) {
+        return '0 2px 20px rgba(0,0,0,0.3), 0 0 40px rgba(0,0,0,0.2)';
+    }
+    
+    return 'none';
+}
+
 // Load saved colors from localStorage
 function loadThemeColors() {
     const savedBg = localStorage.getItem('utang_bg_color');
@@ -784,6 +834,21 @@ function loadThemeColors() {
         if (header) {
             header.style.background = getHeaderGradient(savedBg);
             header.classList.add('custom-header');
+            
+            // Update header text color
+            const headerTitle = header.querySelector('h1');
+            const headerSub = header.querySelector('p');
+            const textColor = getHeaderTextColor(savedBg);
+            const textShadow = getHeaderTextShadow(savedBg);
+            
+            if (headerTitle) {
+                headerTitle.style.color = textColor;
+                headerTitle.style.textShadow = textShadow;
+            }
+            if (headerSub) {
+                headerSub.style.color = textColor;
+                headerSub.style.textShadow = textShadow;
+            }
         }
         
         // Update active state
@@ -814,17 +879,32 @@ function loadThemeColors() {
     }
 }
 
-// Set background color (UPDATED)
+// Set background color (UPDATED with header text)
 function setBgColor(color) {
     document.body.style.backgroundColor = color;
     document.body.style.backgroundImage = 'none';
     localStorage.setItem('utang_bg_color', color);
     
-    // Update header gradient
+    // Update header gradient and text
     const header = document.querySelector('header');
     if (header) {
         header.style.background = getHeaderGradient(color);
         header.classList.add('custom-header');
+        
+        // Update header text color
+        const headerTitle = header.querySelector('h1');
+        const headerSub = header.querySelector('p');
+        const textColor = getHeaderTextColor(color);
+        const textShadow = getHeaderTextShadow(color);
+        
+        if (headerTitle) {
+            headerTitle.style.color = textColor;
+            headerTitle.style.textShadow = textShadow;
+        }
+        if (headerSub) {
+            headerSub.style.color = textColor;
+            headerSub.style.textShadow = textShadow;
+        }
     }
     
     // Update active states
@@ -839,7 +919,7 @@ function setBgColor(color) {
     }
 }
 
-// Set card color (UPDATED)
+// Set card color (unchanged)
 function setCardColor(color) {
     const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
     elements.forEach(el => {
@@ -847,12 +927,10 @@ function setCardColor(color) {
     });
     localStorage.setItem('utang_card_color', color);
     
-    // Update active states
     document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.color === color);
     });
     
-    // Update custom color picker
     const customCardInput = document.getElementById('customCardColor');
     if (customCardInput) {
         customCardInput.value = color;
@@ -866,11 +944,23 @@ function resetBgColor() {
     document.body.style.backgroundImage = '';
     localStorage.removeItem('utang_bg_color');
     
-    // Reset header gradient
+    // Reset header gradient and text
     const header = document.querySelector('header');
     if (header) {
         header.style.background = '';
         header.classList.remove('custom-header');
+        
+        // Reset header text
+        const headerTitle = header.querySelector('h1');
+        const headerSub = header.querySelector('p');
+        if (headerTitle) {
+            headerTitle.style.color = '';
+            headerTitle.style.textShadow = '';
+        }
+        if (headerSub) {
+            headerSub.style.color = '';
+            headerSub.style.textShadow = '';
+        }
     }
     
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
@@ -885,7 +975,7 @@ function resetBgColor() {
     showToast('🔄 Background color reset to default', 'info');
 }
 
-// Reset card color (UPDATED)
+// Reset card color (unchanged)
 function resetCardColor() {
     const defaultColor = '#ffffff';
     const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
