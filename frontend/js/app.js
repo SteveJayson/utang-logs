@@ -100,7 +100,7 @@ async function deleteDebt(debtId, debtReason, debtAmount) {
 }
 
 // ========================================
-// EDIT DEBT WITH MODAL - NEW
+// EDIT DEBT WITH MODAL
 // ========================================
 
 function openEditModal(debtId, currentAmount, currentReason, currentDate, currentStatus) {
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ========================================
-// VIEW DELETE HISTORY - NEW!
+// VIEW DELETE HISTORY
 // ========================================
 
 async function viewDeleteHistory(borrowerId, borrowerName) {
@@ -253,7 +253,7 @@ function closeHistoryModal() {
 }
 
 // ========================================
-// RESTORE DEBT - NEW!
+// RESTORE DEBT
 // ========================================
 
 async function restoreDebt(historyId) {
@@ -430,11 +430,10 @@ async function addPayment(debtId, amountPaid, notes) {
 function renderBorrowers(borrowers) {
     const container = document.getElementById('borrowerList');
     
-    // ✅ UPDATE THE COUNT
+    // Update the borrower count
     const countElement = document.getElementById('borrowerCount');
     if (countElement) {
-        const count = borrowers?.length || 0;
-        countElement.textContent = `${count} borrower${count !== 1 ? 's' : ''}`;
+        countElement.textContent = `${borrowers.length} borrower${borrowers.length !== 1 ? 's' : ''}`;
     }
     
     if (!borrowers || borrowers.length === 0) {
@@ -730,6 +729,132 @@ async function refreshDashboard() {
 }
 
 // ========================================
+// THEME / COLOR SYSTEM
+// ========================================
+
+// Load saved colors from localStorage
+function loadThemeColors() {
+    const savedBg = localStorage.getItem('utang_bg_color');
+    const savedCard = localStorage.getItem('utang_card_color');
+    
+    if (savedBg) {
+        document.body.style.backgroundColor = savedBg;
+        document.body.style.backgroundImage = 'none';
+        // Update active state
+        document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.color === savedBg);
+        });
+    }
+    
+    if (savedCard) {
+        document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item').forEach(el => {
+            el.style.backgroundColor = savedCard;
+        });
+        document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.color === savedCard);
+        });
+    }
+}
+
+// Set background color
+function setBgColor(color) {
+    document.body.style.backgroundColor = color;
+    document.body.style.backgroundImage = 'none';
+    localStorage.setItem('utang_bg_color', color);
+    
+    // Update active states
+    document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === color);
+    });
+}
+
+// Set card color
+function setCardColor(color) {
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item');
+    elements.forEach(el => {
+        el.style.backgroundColor = color;
+    });
+    localStorage.setItem('utang_card_color', color);
+    
+    // Update active states
+    document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === color);
+    });
+}
+
+// Reset background color
+function resetBgColor() {
+    const defaultColor = '#f1f5f9';
+    document.body.style.backgroundColor = defaultColor;
+    document.body.style.backgroundImage = '';
+    localStorage.removeItem('utang_bg_color');
+    
+    document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === defaultColor);
+    });
+    showToast('🔄 Background color reset to default', 'info');
+}
+
+// Reset card color
+function resetCardColor() {
+    const defaultColor = '#ffffff';
+    const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item');
+    elements.forEach(el => {
+        el.style.backgroundColor = defaultColor;
+    });
+    localStorage.removeItem('utang_card_color');
+    
+    document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === defaultColor);
+    });
+    showToast('🔄 Card color reset to default', 'info');
+}
+
+// Apply custom colors from color pickers
+function applyCustomColors() {
+    const bgColor = document.getElementById('customBgColor').value;
+    const cardColor = document.getElementById('customCardColor').value;
+    
+    if (bgColor) {
+        setBgColor(bgColor);
+        document.getElementById('customBgColor').value = bgColor;
+    }
+    
+    if (cardColor) {
+        setCardColor(cardColor);
+        document.getElementById('customCardColor').value = cardColor;
+    }
+    
+    showToast('🎨 Colors updated successfully!', 'success');
+}
+
+// Initialize theme controls
+function initThemeControls() {
+    // Background color buttons
+    document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const color = this.dataset.color;
+            setBgColor(color);
+            document.getElementById('customBgColor').value = color;
+            showToast('🎨 Background color updated!', 'info');
+        });
+    });
+    
+    // Card color buttons
+    document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const color = this.dataset.color;
+            setCardColor(color);
+            document.getElementById('customCardColor').value = color;
+            showToast('🎨 Card color updated!', 'info');
+        });
+    });
+    
+    // Load saved colors
+    loadThemeColors();
+}
+
+// ========================================
 // EVENT LISTENERS
 // ========================================
 
@@ -818,6 +943,7 @@ async function initApp() {
     console.log('🚀 Utang Logs App Starting...');
     console.log('📡 API URL:', API_URL);
     await refreshDashboard();
+    initThemeControls();  // Initialize theme controls
     console.log('✅ App ready!');
 }
 
