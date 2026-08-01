@@ -729,7 +729,7 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM (UPDATED WITH NAV-BAR)
+// THEME / COLOR SYSTEM
 // ========================================
 
 // Generate header gradient based on background color
@@ -787,7 +787,7 @@ function loadThemeColors() {
     }
     
     if (savedCard) {
-        // INCLUDES .nav-bar NOW!
+        // IMPORTANT: .nav-bar and .theme-controls are included!
         const cardElements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
         cardElements.forEach(el => {
             el.style.backgroundColor = savedCard;
@@ -825,7 +825,7 @@ function setBgColor(color) {
     }
 }
 
-// Set card color (UPDATED - includes .nav-bar)
+// Set card color (includes .nav-bar and .theme-controls)
 function setCardColor(color) {
     const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
     elements.forEach(el => {
@@ -868,7 +868,7 @@ function resetBgColor() {
     showToast('🔄 Background color reset to default', 'info');
 }
 
-// Reset card color (UPDATED - includes .nav-bar)
+// Reset card color (includes .nav-bar and .theme-controls)
 function resetCardColor() {
     const defaultColor = '#ffffff';
     const elements = document.querySelectorAll('.borrower-card, .dashboard, .form-section, .debt-detail-view, .debt-item, .payment-item, .theme-controls, .nav-bar');
