@@ -25,6 +25,17 @@ const debtSchema = new mongoose.Schema({
         type: Date,
         required: [true, 'Date borrowed is required'],
         default: Date.now
+    },
+    // NEW FIELDS FOR SOFT DELETE
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    deletedAt: {
+        type: Date
+    },
+    originalDebtId: {
+        type: mongoose.Schema.Types.ObjectId
     }
 }, {
     timestamps: true,

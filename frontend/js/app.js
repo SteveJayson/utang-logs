@@ -64,7 +64,7 @@ async function deleteBorrower(borrowerId, borrowerName, hasRemainingBalance) {
 }
 
 // ========================================
-// DELETE DEBT - NEW!
+// DELETE DEBT WITH HISTORY
 // ========================================
 
 async function deleteDebt(debtId, debtReason, debtAmount) {
@@ -73,7 +73,8 @@ async function deleteDebt(debtId, debtReason, debtAmount) {
         `Reason: ${debtReason}\n` +
         `Amount: ₱${debtAmount.toFixed(2)}\n\n` +
         `This will also delete all payments associated with this debt.\n` +
-        `This action cannot be undone!`
+        `The debt will be saved in Delete History for restoration.\n` +
+        `This action can be undone!`
     );
     
     if (!confirmDelete) return;
@@ -89,9 +90,167 @@ async function deleteDebt(debtId, debtReason, debtAmount) {
         }
         
         await refreshDashboard();
-        showToast('✅ Debt deleted successfully!', 'success');
+        showToast('✅ Debt deleted! You can restore it from History.', 'success');
         
         document.getElementById('debtDetailView').style.display = 'none';
+        
+    } catch (error) {
+        showToast('❌ Error: ' + error.message, 'error');
+    }
+}
+
+// ========================================
+// EDIT DEBT - NEW!
+// ========================================
+
+async function editDebt(debtId, currentAmount, currentReason, currentDate) {
+    const newAmount = prompt('Enter new amount (₱):', currentAmount);
+    if (newAmount === null) return;
+    
+    const newReason = prompt('Enter new reason:', currentReason);
+    if (newReason === null) return;
+    
+    const newDate = prompt('Enter new date (YYYY-MM-DD):', currentDate ? currentDate.split('T')[0] : '');
+    if (newDate === null) return;
+    
+    const amountNum = parseFloat(newAmount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+        showToast('❌ Please enter a valid amount', 'error');
+        return;
+    }
+    
+    if (!newReason.trim()) {
+        showToast('❌ Please enter a reason', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/debts/${debtId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: amountNum,
+                reason: newReason.trim(),
+                dateBorrowed: newDate || undefined
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to edit debt');
+        }
+        
+        await refreshDashboard();
+        showToast('✅ Debt updated successfully!', 'success');
+        document.getElementById('debtDetailView').style.display = 'none';
+        
+    } catch (error) {
+        showToast('❌ Error: ' + error.message, 'error');
+    }
+}
+
+// ========================================
+// VIEW DELETE HISTORY - NEW!
+// ========================================
+
+async function viewDeleteHistory(borrowerId, borrowerName) {
+    try {
+        const url = borrowerId ? `${API_URL}/debts/history/${borrowerId}` : `${API_URL}/debts/history`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch delete history');
+        }
+        
+        const data = await response.json();
+        const history = data.data || [];
+        
+        if (history.length === 0) {
+            showToast('📭 No deleted debts found', 'info');
+            return;
+        }
+        
+        let historyHtml = `
+            <div class="history-modal">
+                <div class="history-modal-content">
+                    <div class="history-modal-header">
+                        <div>
+                            <h2>🗑️ Deleted Debts History</h2>
+                            ${borrowerName ? `<p>For: ${borrowerName}</p>` : ''}
+                            <p style="font-size:0.8rem;color:var(--gray-400);">${history.length} deleted debts found</p>
+                        </div>
+                        <button onclick="closeHistoryModal()" class="btn-close-modal">✕</button>
+                    </div>
+                    <div class="history-modal-body">
+        `;
+        
+        history.forEach(item => {
+            historyHtml += `
+                <div class="history-item">
+                    <div class="history-info">
+                        <strong>${item.reason}</strong>
+                        <span class="history-amount">₱${item.amount.toFixed(2)}</span>
+                        <span class="history-date">📅 ${formatDate(item.dateBorrowed)}</span>
+                        <span class="history-status status-${item.status.toLowerCase()}">${item.status}</span>
+                        <span class="history-deleted">🗑️ Deleted: ${formatDate(item.deletedAt)}</span>
+                        ${item.borrowerName ? `<span class="history-borrower">👤 ${item.borrowerName}</span>` : ''}
+                        ${item.restored ? `<span class="history-restored">✅ Restored</span>` : ''}
+                    </div>
+                    ${!item.restored ? `<button onclick="restoreDebt('${item._id}')" class="btn-restore">↩️ Restore</button>` : ''}
+                </div>
+            `;
+        });
+        
+        historyHtml += `
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const existingModal = document.querySelector('.history-modal');
+        if (existingModal) existingModal.remove();
+        
+        const modalDiv = document.createElement('div');
+        modalDiv.innerHTML = historyHtml;
+        document.body.appendChild(modalDiv.firstElementChild);
+        
+    } catch (error) {
+        showToast('❌ Error loading history: ' + error.message, 'error');
+    }
+}
+
+function closeHistoryModal() {
+    const modal = document.querySelector('.history-modal');
+    if (modal) modal.remove();
+}
+
+// ========================================
+// RESTORE DEBT - NEW!
+// ========================================
+
+async function restoreDebt(historyId) {
+    const confirmRestore = confirm(
+        '↩️ Restore this debt?\n\n' +
+        'This will recreate the debt with the same details.\n' +
+        'All payments will need to be re-recorded.\n\n' +
+        'Do you want to continue?'
+    );
+    
+    if (!confirmRestore) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/debts/restore/${historyId}`, {
+            method: 'POST'
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to restore debt');
+        }
+        
+        showToast('✅ Debt restored successfully!', 'success');
+        closeHistoryModal();
+        await refreshDashboard();
         
     } catch (error) {
         showToast('❌ Error: ' + error.message, 'error');
@@ -265,9 +424,14 @@ function renderBorrowers(borrowers) {
                     <span class="name">${borrower.name}</span>
                     ${borrower.contactInfo ? `<span class="contact">📱 ${borrower.contactInfo}</span>` : ''}
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                     <span class="debt-count">${borrower.activeDebtCount || 0} active debts</span>
                     ${isFullyPaid ? '<span class="badge-paid">✅ Fully Paid</span>' : ''}
+                    <button onclick="event.stopPropagation(); viewDeleteHistory('${borrower._id}', '${borrower.name}')" 
+                            class="btn-history"
+                            title="View deleted debts history">
+                        📜
+                    </button>
                     <button onclick="event.stopPropagation(); deleteBorrower('${borrower._id}', '${borrower.name}', ${borrower.totalRemaining || 0})" 
                             class="btn-delete"
                             title="Delete borrower${!isFullyPaid && hasDebts ? ' (has remaining balance)' : ''}">
@@ -331,11 +495,18 @@ async function showBorrowerDebts(borrowerId) {
                     </span>
                 </div>
                 <span class="debt-status status-${debt.status.toLowerCase()}">${debt.status}</span>
-                <button onclick="event.stopPropagation(); deleteDebt('${debt._id}', '${debt.reason}', ${debt.amount})" 
-                        class="btn-delete-debt"
-                        title="Delete this debt">
-                    🗑️
-                </button>
+                <div class="debt-actions">
+                    <button onclick="event.stopPropagation(); editDebt('${debt._id}', ${debt.amount}, '${debt.reason}', '${debt.dateBorrowed}')" 
+                            class="btn-edit-debt"
+                            title="Edit this debt">
+                        ✏️
+                    </button>
+                    <button onclick="event.stopPropagation(); deleteDebt('${debt._id}', '${debt.reason}', ${debt.amount})" 
+                            class="btn-delete-debt"
+                            title="Delete this debt">
+                        🗑️
+                    </button>
+                </div>
             </div>
         `).join('');
     } else {
@@ -361,7 +532,7 @@ async function showBorrowerDebts(borrowerId) {
             ${debtsHtml}
         </div>
         <div class="click-hint" style="margin-top:15px;text-align:center;color:var(--gray-400);font-size:0.85rem;">
-            👆 Click a debt to view payments | 🗑️ Click trash to delete
+            👆 Click a debt to view payments | ✏️ Edit | 🗑️ Delete
         </div>
     `;
     
