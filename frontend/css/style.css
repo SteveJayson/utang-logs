@@ -1465,13 +1465,8 @@ header p {
     transform: translateY(0);
 }
 
-/* Header - ensure text is visible on dark backgrounds */
-header.custom-header h1,
-header.custom-header p {
-    transition: color 0.4s ease, text-shadow 0.4s ease;
-}
-
-/* Theme group border for save button section */
-.theme-group .btn-save-colors {
-    margin-top: 0;
+/* Header text transitions */
+header h1,
+header p {
+    transition: color 0.3s ease;
 }

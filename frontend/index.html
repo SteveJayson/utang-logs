@@ -14,70 +14,114 @@
         </header>
 
         <!-- ============================================ -->
-        <!-- THEME CONTROLS                               -->
-        <!-- ============================================ -->
-        <div class="theme-controls">
-            <div class="theme-group">
-                <label>🎨 Background Color</label>
-                <div class="color-options" id="bgColorOptions">
-                    <button class="color-btn active" data-color="#f1f5f9" style="background:#f1f5f9;" title="Default Light"></button>
-                    <button class="color-btn" data-color="#1a1a2e" style="background:#1a1a2e;" title="Dark"></button>
-                    <button class="color-btn" data-color="#0f0e17" style="background:#0f0e17;" title="Dark Blue"></button>
-                    <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;" title="Purple Night"></button>
-                    <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;" title="Deep Ocean"></button>
-                    <button class="color-btn" data-color="#2d2d2d" style="background:#2d2d2d;" title="Dark Gray"></button>
-                    <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;" title="Warm Cream"></button>
-                    <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;" title="Soft Green"></button>
-                    <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;" title="Peach"></button>
-                    <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;" title="Sky Blue"></button>
-                    <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;" title="Soft Pink"></button>
-                    <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;" title="Lavender"></button>
-                </div>
-                <button onclick="resetBgColor()" class="btn-reset-color">↺ Reset</button>
-            </div>
-
-            <div class="theme-group">
-                <label>📋 Card Background Color</label>
-                <div class="color-options" id="cardColorOptions">
-                    <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;border:2px solid #ddd;" title="White"></button>
-                    <button class="color-btn" data-color="#f8f9fa" style="background:#f8f9fa;border:2px solid #ddd;" title="Light Gray"></button>
-                    <button class="color-btn" data-color="#1e1e2e" style="background:#1e1e2e;border:2px solid #ddd;" title="Dark Card"></button>
-                    <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;border:2px solid #ddd;" title="Purple"></button>
-                    <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;border:2px solid #ddd;" title="Ocean"></button>
-                    <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;border:2px solid #ddd;" title="Cream"></button>
-                    <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;border:2px solid #ddd;" title="Green"></button>
-                    <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;border:2px solid #ddd;" title="Peach"></button>
-                    <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;border:2px solid #ddd;" title="Sky Blue"></button>
-                    <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;border:2px solid #ddd;" title="Pink"></button>
-                    <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;border:2px solid #ddd;" title="Lavender"></button>
-                    <button class="color-btn" data-color="#fff9c4" style="background:#fff9c4;border:2px solid #ddd;" title="Light Yellow"></button>
-                </div>
-                <button onclick="resetCardColor()" class="btn-reset-color">↺ Reset</button>
-            </div>
-
-            <!-- Custom Color Picker -->
-            <div class="theme-group" style="border-top:1px solid var(--gray-200);padding-top:15px;margin-top:10px;">
-                <label>🎨 Custom Color</label>
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                    <input type="color" id="customBgColor" value="#f1f5f9" style="width:50px;height:50px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;">
-                    <span style="font-size:0.85rem;color:var(--gray-500);">Background</span>
-                    <input type="color" id="customCardColor" value="#ffffff" style="width:50px;height:50px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;margin-left:10px;">
-                    <span style="font-size:0.85rem;color:var(--gray-500);">Cards</span>
-                    <button onclick="applyCustomColors()" class="btn-apply-color">Apply Colors</button>
-                </div>
-            </div>
-
-            <!-- SAVE BUTTON -->
-            <div class="theme-group" style="border-top:2px solid #10b981;padding-top:15px;margin-top:10px;">
-                <button onclick="saveColors()" class="btn-save-colors">
-                    💾 Save Colors Permanently
-                </button>
-                <p style="font-size:0.8rem;color:var(--gray-400);margin-top:5px;">
-                    ⚡ Colors are saved automatically when you click a color. 
-                    Click Save to ensure they persist after refresh.
-                </p>
-            </div>
+<!-- THEME CONTROLS                               -->
+<!-- ============================================ -->
+<div class="theme-controls">
+    <!-- Background Color -->
+    <div class="theme-group">
+        <label>🎨 Background Color</label>
+        <div class="color-options" id="bgColorOptions">
+            <button class="color-btn active" data-color="#f1f5f9" style="background:#f1f5f9;" title="Default Light"></button>
+            <button class="color-btn" data-color="#1a1a2e" style="background:#1a1a2e;" title="Dark"></button>
+            <button class="color-btn" data-color="#0f0e17" style="background:#0f0e17;" title="Dark Blue"></button>
+            <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;" title="Purple Night"></button>
+            <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;" title="Deep Ocean"></button>
+            <button class="color-btn" data-color="#2d2d2d" style="background:#2d2d2d;" title="Dark Gray"></button>
+            <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;" title="Warm Cream"></button>
+            <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;" title="Soft Green"></button>
+            <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;" title="Peach"></button>
+            <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;" title="Sky Blue"></button>
+            <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;" title="Soft Pink"></button>
+            <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;" title="Lavender"></button>
         </div>
+        <button onclick="resetBgColor()" class="btn-reset-color">↺ Reset</button>
+    </div>
+
+    <!-- Card Background Color -->
+    <div class="theme-group">
+        <label>📋 Card Background Color</label>
+        <div class="color-options" id="cardColorOptions">
+            <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;border:2px solid #ddd;" title="White"></button>
+            <button class="color-btn" data-color="#f8f9fa" style="background:#f8f9fa;border:2px solid #ddd;" title="Light Gray"></button>
+            <button class="color-btn" data-color="#1e1e2e" style="background:#1e1e2e;border:2px solid #ddd;" title="Dark Card"></button>
+            <button class="color-btn" data-color="#2d1b69" style="background:#2d1b69;border:2px solid #ddd;" title="Purple"></button>
+            <button class="color-btn" data-color="#1b3a4b" style="background:#1b3a4b;border:2px solid #ddd;" title="Ocean"></button>
+            <button class="color-btn" data-color="#fef9e7" style="background:#fef9e7;border:2px solid #ddd;" title="Cream"></button>
+            <button class="color-btn" data-color="#e8f5e9" style="background:#e8f5e9;border:2px solid #ddd;" title="Green"></button>
+            <button class="color-btn" data-color="#fff3e0" style="background:#fff3e0;border:2px solid #ddd;" title="Peach"></button>
+            <button class="color-btn" data-color="#e3f2fd" style="background:#e3f2fd;border:2px solid #ddd;" title="Sky Blue"></button>
+            <button class="color-btn" data-color="#fce4ec" style="background:#fce4ec;border:2px solid #ddd;" title="Pink"></button>
+            <button class="color-btn" data-color="#f3e5f5" style="background:#f3e5f5;border:2px solid #ddd;" title="Lavender"></button>
+            <button class="color-btn" data-color="#fff9c4" style="background:#fff9c4;border:2px solid #ddd;" title="Light Yellow"></button>
+        </div>
+        <button onclick="resetCardColor()" class="btn-reset-color">↺ Reset</button>
+    </div>
+
+    <!-- Title Color -->
+    <div class="theme-group">
+        <label>📝 Title Color</label>
+        <div class="color-options" id="titleColorOptions">
+            <button class="color-btn active" data-color="#ffffff" style="background:#ffffff;border:2px solid #ddd;" title="White"></button>
+            <button class="color-btn" data-color="#000000" style="background:#000000;border:2px solid #ddd;" title="Black"></button>
+            <button class="color-btn" data-color="#ff6b6b" style="background:#ff6b6b;border:2px solid #ddd;" title="Red"></button>
+            <button class="color-btn" data-color="#ffd93d" style="background:#ffd93d;border:2px solid #ddd;" title="Yellow"></button>
+            <button class="color-btn" data-color="#6bcb77" style="background:#6bcb77;border:2px solid #ddd;" title="Green"></button>
+            <button class="color-btn" data-color="#4d96ff" style="background:#4d96ff;border:2px solid #ddd;" title="Blue"></button>
+            <button class="color-btn" data-color="#ff6fb7" style="background:#ff6fb7;border:2px solid #ddd;" title="Pink"></button>
+            <button class="color-btn" data-color="#a66cff" style="background:#a66cff;border:2px solid #ddd;" title="Purple"></button>
+            <button class="color-btn" data-color="#ff9a76" style="background:#ff9a76;border:2px solid #ddd;" title="Orange"></button>
+            <button class="color-btn" data-color="#00d2d3" style="background:#00d2d3;border:2px solid #ddd;" title="Cyan"></button>
+            <button class="color-btn" data-color="#f368e0" style="background:#f368e0;border:2px solid #ddd;" title="Magenta"></button>
+            <button class="color-btn" data-color="#ffc048" style="background:#ffc048;border:2px solid #ddd;" title="Gold"></button>
+        </div>
+        <button onclick="resetTitleColor()" class="btn-reset-color">↺ Reset</button>
+    </div>
+
+    <!-- Subtitle Color -->
+    <div class="theme-group">
+        <label>📄 Subtitle Color</label>
+        <div class="color-options" id="subtitleColorOptions">
+            <button class="color-btn active" data-color="rgba(255,255,255,0.9)" style="background:#ffffff;border:2px solid #ddd;opacity:0.9;" title="White"></button>
+            <button class="color-btn" data-color="#000000" style="background:#000000;border:2px solid #ddd;" title="Black"></button>
+            <button class="color-btn" data-color="#ff6b6b" style="background:#ff6b6b;border:2px solid #ddd;" title="Red"></button>
+            <button class="color-btn" data-color="#ffd93d" style="background:#ffd93d;border:2px solid #ddd;" title="Yellow"></button>
+            <button class="color-btn" data-color="#6bcb77" style="background:#6bcb77;border:2px solid #ddd;" title="Green"></button>
+            <button class="color-btn" data-color="#4d96ff" style="background:#4d96ff;border:2px solid #ddd;" title="Blue"></button>
+            <button class="color-btn" data-color="#ff6fb7" style="background:#ff6fb7;border:2px solid #ddd;" title="Pink"></button>
+            <button class="color-btn" data-color="#a66cff" style="background:#a66cff;border:2px solid #ddd;" title="Purple"></button>
+            <button class="color-btn" data-color="#ff9a76" style="background:#ff9a76;border:2px solid #ddd;" title="Orange"></button>
+            <button class="color-btn" data-color="#00d2d3" style="background:#00d2d3;border:2px solid #ddd;" title="Cyan"></button>
+        </div>
+        <button onclick="resetSubtitleColor()" class="btn-reset-color">↺ Reset</button>
+    </div>
+
+    <!-- Custom Color Picker -->
+    <div class="theme-group" style="border-top:1px solid var(--gray-200);padding-top:15px;margin-top:10px;">
+        <label>🎨 Custom Colors</label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input type="color" id="customBgColor" value="#f1f5f9" style="width:45px;height:45px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;">
+            <span style="font-size:0.8rem;color:var(--gray-500);">BG</span>
+            <input type="color" id="customCardColor" value="#ffffff" style="width:45px;height:45px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;">
+            <span style="font-size:0.8rem;color:var(--gray-500);">Cards</span>
+            <input type="color" id="customTitleColor" value="#ffffff" style="width:45px;height:45px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;">
+            <span style="font-size:0.8rem;color:var(--gray-500);">Title</span>
+            <input type="color" id="customSubtitleColor" value="rgba(255,255,255,0.9)" style="width:45px;height:45px;border-radius:8px;cursor:pointer;border:2px solid var(--gray-200);padding:2px;">
+            <span style="font-size:0.8rem;color:var(--gray-500);">Subtitle</span>
+            <button onclick="applyCustomColors()" class="btn-apply-color" style="margin-top:5px;">Apply All</button>
+        </div>
+    </div>
+
+    <!-- SAVE BUTTON -->
+    <div class="theme-group" style="border-top:2px solid #10b981;padding-top:15px;margin-top:10px;">
+        <button onclick="saveColors()" class="btn-save-colors">
+            💾 Save Colors Permanently
+        </button>
+        <p style="font-size:0.8rem;color:var(--gray-400);margin-top:5px;">
+            ⚡ Colors are saved automatically when you click a color. 
+            Click Save to ensure they persist after refresh.
+        </p>
+    </div>
+</div>
 
         <!-- Navigation -->
         <nav class="nav-bar">

@@ -729,67 +729,19 @@ async function refreshDashboard() {
 }
 
 // ========================================
-// THEME / COLOR SYSTEM
+// THEME / COLOR SYSTEM (UPDATED)
 // ========================================
-
-// Check if a color is dark (for text color adjustment)
-function isDarkColor(color) {
-    if (color.startsWith('#')) {
-        const hex = color.replace('#', '');
-        const r = parseInt(hex.substr(0, 2), 16);
-        const g = parseInt(hex.substr(2, 2), 16);
-        const b = parseInt(hex.substr(4, 2), 16);
-        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-        return brightness < 128;
-    }
-    return false;
-}
-
-// Get header text color based on background
-function getHeaderTextColor(bgColor) {
-    if (isDarkColor(bgColor)) {
-        return '#ffffff';
-    }
-    return '#ffffff';
-}
-
-// Get header text shadow based on background
-function getHeaderTextShadow(bgColor) {
-    if (isDarkColor(bgColor)) {
-        return '0 2px 20px rgba(0,0,0,0.3), 0 0 40px rgba(0,0,0,0.2)';
-    }
-    return 'none';
-}
 
 // Load saved colors from localStorage
 function loadThemeColors() {
     const savedBg = localStorage.getItem('utang_bg_color');
     const savedCard = localStorage.getItem('utang_card_color');
+    const savedTitleColor = localStorage.getItem('utang_title_color');
+    const savedSubtitleColor = localStorage.getItem('utang_subtitle_color');
     
     if (savedBg) {
         document.body.style.backgroundColor = savedBg;
         document.body.style.backgroundImage = 'none';
-        
-        // Apply header color (same as background)
-        const header = document.querySelector('header');
-        if (header) {
-            header.style.background = savedBg;
-            header.classList.add('custom-header');
-            
-            const headerTitle = header.querySelector('h1');
-            const headerSub = header.querySelector('p');
-            const textColor = getHeaderTextColor(savedBg);
-            const textShadow = getHeaderTextShadow(savedBg);
-            
-            if (headerTitle) {
-                headerTitle.style.color = textColor;
-                headerTitle.style.textShadow = textShadow;
-            }
-            if (headerSub) {
-                headerSub.style.color = textColor;
-                headerSub.style.textShadow = textShadow;
-            }
-        }
         
         // Update active state
         document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
@@ -816,6 +768,43 @@ function loadThemeColors() {
             customCardInput.value = savedCard;
         }
     }
+    
+    // Load title colors (header text)
+    if (savedTitleColor) {
+        const headerTitle = document.querySelector('header h1');
+        if (headerTitle) {
+            headerTitle.style.color = savedTitleColor;
+        }
+        // Update active state for title color buttons
+        document.querySelectorAll('#titleColorOptions .color-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.color === savedTitleColor);
+        });
+        const customTitleInput = document.getElementById('customTitleColor');
+        if (customTitleInput) {
+            customTitleInput.value = savedTitleColor;
+        }
+    }
+    
+    if (savedSubtitleColor) {
+        const headerSub = document.querySelector('header p');
+        if (headerSub) {
+            headerSub.style.color = savedSubtitleColor;
+        }
+        document.querySelectorAll('#subtitleColorOptions .color-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.color === savedSubtitleColor);
+        });
+        const customSubtitleInput = document.getElementById('customSubtitleColor');
+        if (customSubtitleInput) {
+            customSubtitleInput.value = savedSubtitleColor;
+        }
+    }
+    
+    // Reset header background to gradient (no custom background)
+    const header = document.querySelector('header');
+    if (header) {
+        header.style.background = '';
+        header.classList.remove('custom-header');
+    }
 }
 
 // Set background color
@@ -824,25 +813,11 @@ function setBgColor(color) {
     document.body.style.backgroundImage = 'none';
     localStorage.setItem('utang_bg_color', color);
     
-    // Apply header color (same as background)
+    // Reset header background to gradient (not matching bg)
     const header = document.querySelector('header');
     if (header) {
-        header.style.background = color;
-        header.classList.add('custom-header');
-        
-        const headerTitle = header.querySelector('h1');
-        const headerSub = header.querySelector('p');
-        const textColor = getHeaderTextColor(color);
-        const textShadow = getHeaderTextShadow(color);
-        
-        if (headerTitle) {
-            headerTitle.style.color = textColor;
-            headerTitle.style.textShadow = textShadow;
-        }
-        if (headerSub) {
-            headerSub.style.color = textColor;
-            headerSub.style.textShadow = textShadow;
-        }
+        header.style.background = '';
+        header.classList.remove('custom-header');
     }
     
     // Update active states
@@ -874,6 +849,42 @@ function setCardColor(color) {
     }
 }
 
+// Set title color (header h1)
+function setTitleColor(color) {
+    const headerTitle = document.querySelector('header h1');
+    if (headerTitle) {
+        headerTitle.style.color = color;
+    }
+    localStorage.setItem('utang_title_color', color);
+    
+    document.querySelectorAll('#titleColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === color);
+    });
+    
+    const customTitleInput = document.getElementById('customTitleColor');
+    if (customTitleInput) {
+        customTitleInput.value = color;
+    }
+}
+
+// Set subtitle color (header p)
+function setSubtitleColor(color) {
+    const headerSub = document.querySelector('header p');
+    if (headerSub) {
+        headerSub.style.color = color;
+    }
+    localStorage.setItem('utang_subtitle_color', color);
+    
+    document.querySelectorAll('#subtitleColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === color);
+    });
+    
+    const customSubtitleInput = document.getElementById('customSubtitleColor');
+    if (customSubtitleInput) {
+        customSubtitleInput.value = color;
+    }
+}
+
 // Reset background color
 function resetBgColor() {
     const defaultColor = '#f1f5f9';
@@ -885,17 +896,6 @@ function resetBgColor() {
     if (header) {
         header.style.background = '';
         header.classList.remove('custom-header');
-        
-        const headerTitle = header.querySelector('h1');
-        const headerSub = header.querySelector('p');
-        if (headerTitle) {
-            headerTitle.style.color = '';
-            headerTitle.style.textShadow = '';
-        }
-        if (headerSub) {
-            headerSub.style.color = '';
-            headerSub.style.textShadow = '';
-        }
     }
     
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
@@ -931,10 +931,54 @@ function resetCardColor() {
     showToast('🔄 Card color reset to default', 'info');
 }
 
+// Reset title color
+function resetTitleColor() {
+    const defaultColor = '#ffffff';
+    const headerTitle = document.querySelector('header h1');
+    if (headerTitle) {
+        headerTitle.style.color = '';
+    }
+    localStorage.removeItem('utang_title_color');
+    
+    document.querySelectorAll('#titleColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === defaultColor);
+    });
+    
+    const customTitleInput = document.getElementById('customTitleColor');
+    if (customTitleInput) {
+        customTitleInput.value = defaultColor;
+    }
+    
+    showToast('🔄 Title color reset to default', 'info');
+}
+
+// Reset subtitle color
+function resetSubtitleColor() {
+    const defaultColor = 'rgba(255,255,255,0.9)';
+    const headerSub = document.querySelector('header p');
+    if (headerSub) {
+        headerSub.style.color = '';
+    }
+    localStorage.removeItem('utang_subtitle_color');
+    
+    document.querySelectorAll('#subtitleColorOptions .color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === defaultColor);
+    });
+    
+    const customSubtitleInput = document.getElementById('customSubtitleColor');
+    if (customSubtitleInput) {
+        customSubtitleInput.value = defaultColor;
+    }
+    
+    showToast('🔄 Subtitle color reset to default', 'info');
+}
+
 // Apply custom colors from color pickers
 function applyCustomColors() {
     const bgColor = document.getElementById('customBgColor').value;
     const cardColor = document.getElementById('customCardColor').value;
+    const titleColor = document.getElementById('customTitleColor').value;
+    const subtitleColor = document.getElementById('customSubtitleColor').value;
     
     if (bgColor) {
         setBgColor(bgColor);
@@ -944,17 +988,26 @@ function applyCustomColors() {
         setCardColor(cardColor);
     }
     
+    if (titleColor) {
+        setTitleColor(titleColor);
+    }
+    
+    if (subtitleColor) {
+        setSubtitleColor(subtitleColor);
+    }
+    
     showToast('🎨 Colors applied and saved!', 'success');
 }
 
 // ========================================
-// SAVE COLORS - NEW!
+// SAVE COLORS
 // ========================================
 
 function saveColors() {
-    // Get current colors from localStorage (already saved when user clicks)
     const bgColor = localStorage.getItem('utang_bg_color');
     const cardColor = localStorage.getItem('utang_card_color');
+    const titleColor = localStorage.getItem('utang_title_color');
+    const subtitleColor = localStorage.getItem('utang_subtitle_color');
     
     let savedCount = 0;
     
@@ -981,10 +1034,28 @@ function saveColors() {
         }
     }
     
-    const header = document.querySelector('header');
-    if (header) {
-        const bg = header.style.background || getComputedStyle(header).background;
-        localStorage.setItem('utang_header_color', bg);
+    if (titleColor) {
+        localStorage.setItem('utang_title_color', titleColor);
+        savedCount++;
+    } else {
+        const headerTitle = document.querySelector('header h1');
+        if (headerTitle) {
+            const currentTitle = headerTitle.style.color || '#ffffff';
+            localStorage.setItem('utang_title_color', currentTitle);
+            savedCount++;
+        }
+    }
+    
+    if (subtitleColor) {
+        localStorage.setItem('utang_subtitle_color', subtitleColor);
+        savedCount++;
+    } else {
+        const headerSub = document.querySelector('header p');
+        if (headerSub) {
+            const currentSub = headerSub.style.color || 'rgba(255,255,255,0.9)';
+            localStorage.setItem('utang_subtitle_color', currentSub);
+            savedCount++;
+        }
     }
     
     if (savedCount > 0) {
@@ -996,19 +1067,39 @@ function saveColors() {
 
 // Initialize theme controls
 function initThemeControls() {
+    // Background color buttons
     document.querySelectorAll('#bgColorOptions .color-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const color = this.dataset.color;
             setBgColor(color);
-            showToast('🎨 Background color applied and saved!', 'info');
+            showToast('🎨 Background color applied!', 'info');
         });
     });
     
+    // Card color buttons
     document.querySelectorAll('#cardColorOptions .color-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const color = this.dataset.color;
             setCardColor(color);
-            showToast('🎨 Card color applied and saved!', 'info');
+            showToast('🎨 Card color applied!', 'info');
+        });
+    });
+    
+    // Title color buttons
+    document.querySelectorAll('#titleColorOptions .color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const color = this.dataset.color;
+            setTitleColor(color);
+            showToast('🎨 Title color applied!', 'info');
+        });
+    });
+    
+    // Subtitle color buttons
+    document.querySelectorAll('#subtitleColorOptions .color-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const color = this.dataset.color;
+            setSubtitleColor(color);
+            showToast('🎨 Subtitle color applied!', 'info');
         });
     });
     
