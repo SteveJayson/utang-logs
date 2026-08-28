@@ -473,10 +473,7 @@ function renderBorrowers(borrowers) {
                 </div>
             </div>
             <div class="details">
-                <div class="detail-item">
-                    <label>Total Borrowed</label>
-                    <div class="value">₱${borrower.totalBorrowed?.toFixed(2) || '0.00'}</div>
-                </div>
+                <!-- Total Borrowed REMOVED -->
                 <div class="detail-item">
                     <label>Total Paid</label>
                     <div class="value negative">₱${borrower.totalPaid?.toFixed(2) || '0.00'}</div>
