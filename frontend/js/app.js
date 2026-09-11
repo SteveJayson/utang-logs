@@ -403,12 +403,12 @@ async function addDebt(borrowerId, amount, reason, dateBorrowed) {
     }
 }
 
-async function addPayment(debtId, amountPaid, notes) {
+async function addPayment(debtId, amountPaid, notes, datePaid) {
     try {
         const response = await fetch(`${API_URL}/payments`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ debtId, amountPaid, notes })
+            body: JSON.stringify({ debtId, amountPaid, notes, datePaid })
         });
         
         if (!response.ok) {
@@ -420,6 +420,45 @@ async function addPayment(debtId, amountPaid, notes) {
         return data.data;
     } catch (error) {
         throw error;
+    }
+}
+
+// ========================================
+// QUICK PAYMENT - NEW FEATURE
+// ========================================
+
+async function quickPayment(debtId, remainingBalance) {
+    const input = document.getElementById(`quickPay_${debtId}`);
+    const amount = parseFloat(input.value);
+    const dateInput = document.getElementById(`quickPayDate_${debtId}`);
+    const datePaid = dateInput ? dateInput.value : '';
+    
+    if (isNaN(amount) || amount <= 0) {
+        showToast('❌ Please enter a valid amount', 'error');
+        return;
+    }
+    
+    if (amount > remainingBalance) {
+        showToast(`❌ Amount exceeds remaining balance of ₱${remainingBalance.toFixed(2)}`, 'error');
+        return;
+    }
+    
+    // Auto-detect status (backend will also verify)
+    const newStatus = amount >= remainingBalance ? 'Paid' : 'Partial';
+    
+    try {
+        await addPayment(debtId, amount, 'Quick payment', datePaid);
+        
+        // Clear the input
+        input.value = '';
+        
+        showToast(`✅ Payment recorded! Status: ${newStatus}`, 'success');
+        
+        // Refresh the debt list
+        await showBorrowerDebts(currentBorrowerId);
+        
+    } catch (error) {
+        showToast('❌ Error: ' + error.message, 'error');
     }
 }
 
@@ -473,7 +512,6 @@ function renderBorrowers(borrowers) {
                 </div>
             </div>
             <div class="details">
-                <!-- Total Borrowed REMOVED -->
                 <div class="detail-item">
                     <label>Total Paid</label>
                     <div class="value negative">₱${borrower.totalPaid?.toFixed(2) || '0.00'}</div>
@@ -510,9 +548,25 @@ async function showBorrowerDebts(borrowerId) {
     const detailView = document.getElementById('debtDetailView');
     const content = document.getElementById('debtDetailContent');
     
+    // Sort debts from low to high (unpaid first, then by remaining balance)
+    const sortedDebts = [...debts].sort((a, b) => {
+        // Unpaid/Partial debts first
+        if (a.status === 'Paid' && b.status !== 'Paid') return 1;
+        if (a.status !== 'Paid' && b.status === 'Paid') return -1;
+        
+        // Then sort by remaining balance (low to high)
+        const aRemaining = a.amount - (a.totalPaid || 0);
+        const bRemaining = b.amount - (b.totalPaid || 0);
+        return aRemaining - bRemaining;
+    });
+    
     let debtsHtml = '';
-    if (debts && debts.length > 0) {
-        debtsHtml = debts.map(debt => `
+    if (sortedDebts && sortedDebts.length > 0) {
+        debtsHtml = sortedDebts.map(debt => {
+            const remaining = debt.amount - (debt.totalPaid || 0);
+            const isPaid = debt.status === 'Paid';
+            
+            return `
             <div class="debt-item">
                 <div class="debt-info" onclick="showDebtPayments('${debt._id}')" style="flex:1;cursor:pointer;">
                     <span class="reason">${debt.reason}</span>
@@ -521,11 +575,34 @@ async function showBorrowerDebts(borrowerId) {
                 <div class="debt-amount ${debt.status.toLowerCase()}">
                     ₱${debt.amount.toFixed(2)}
                     <span style="font-size:0.8rem;color:var(--gray-400);font-weight:400;">
-                        (Paid: ₱${debt.totalPaid.toFixed(2)})
+                        (Paid: ₱${(debt.totalPaid || 0).toFixed(2)})
                     </span>
                 </div>
                 <span class="debt-status status-${debt.status.toLowerCase()}">${debt.status}</span>
                 <div class="debt-actions">
+                    ${!isPaid ? `
+                        <div class="quick-pay-container">
+                            <input type="number" 
+                                   id="quickPay_${debt._id}" 
+                                   class="quick-pay-input" 
+                                   placeholder="₱" 
+                                   step="0.01" 
+                                   min="0.01" 
+                                   max="${remaining}"
+                                   onclick="event.stopPropagation();"
+                                   onkeypress="if(event.key==='Enter'){event.stopPropagation(); quickPayment('${debt._id}', ${remaining});}">
+                            <input type="date" 
+                                   id="quickPayDate_${debt._id}" 
+                                   class="quick-pay-date"
+                                   value="${new Date().toISOString().split('T')[0]}"
+                                   onclick="event.stopPropagation();">
+                            <button onclick="event.stopPropagation(); quickPayment('${debt._id}', ${remaining})" 
+                                    class="btn-quick-pay"
+                                    title="Record payment">
+                                💵
+                            </button>
+                        </div>
+                    ` : '<span class="paid-label">✅ Paid</span>'}
                     <button onclick="event.stopPropagation(); openEditModal('${debt._id}', ${debt.amount}, '${debt.reason}', '${debt.dateBorrowed}', '${debt.status}')" 
                             class="btn-edit-debt"
                             title="Edit this debt">
@@ -538,7 +615,7 @@ async function showBorrowerDebts(borrowerId) {
                     </button>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     } else {
         debtsHtml = `<div class="no-payments"><span class="icon">📭</span>No debts recorded for this borrower.</div>`;
     }
@@ -558,7 +635,8 @@ async function showBorrowerDebts(borrowerId) {
             </div>
         </div>
         <div class="debt-list">
-            <div class="debt-list-title">💰 Debts (${debts.length})</div>
+            <div class="debt-list-title">💰 Debts (${sortedDebts.length}) - Sorted Low to High</div>
+            <div class="debt-list-hint">💡 Type payment amount and press Enter or click 💵</div>
             ${debtsHtml}
         </div>
         <div class="click-hint" style="margin-top:15px;text-align:center;color:var(--gray-400);font-size:0.85rem;">
@@ -591,7 +669,12 @@ async function showDebtPayments(debtId) {
         
         let paymentsHtml = '';
         if (debtData.payments && debtData.payments.length > 0) {
-            paymentsHtml = debtData.payments.map(p => `
+            // Sort payments by date (newest first)
+            const sortedPayments = [...debtData.payments].sort((a, b) => 
+                new Date(b.datePaid) - new Date(a.datePaid)
+            );
+            
+            paymentsHtml = sortedPayments.map(p => `
                 <div class="payment-item">
                     <div class="payment-info">
                         <span class="amount">₱${p.amountPaid.toFixed(2)}</span>
@@ -625,6 +708,33 @@ async function showDebtPayments(debtId) {
                 <div style="margin-top:8px;font-size:0.95rem;color:var(--gray-500);">
                     Paid: ₱${(debtData.totalPaid || 0).toFixed(2)} | Remaining: ₱${(debtData.remainingBalance || 0).toFixed(2)}
                 </div>
+                
+                ${debtData.status !== 'Paid' ? `
+                    <div style="margin-top:15px;padding-top:15px;border-top:1px solid var(--gray-200);">
+                        <label style="font-size:0.85rem;font-weight:600;color:var(--gray-600);display:block;margin-bottom:8px;">
+                            💵 Quick Payment
+                        </label>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <input type="number" 
+                                   id="detailPayAmount" 
+                                   class="quick-pay-input" 
+                                   placeholder="Amount ₱" 
+                                   step="0.01" 
+                                   min="0.01" 
+                                   max="${debtData.remainingBalance}"
+                                   style="flex:1;min-width:120px;">
+                            <input type="date" 
+                                   id="detailPayDate" 
+                                   class="quick-pay-date"
+                                   value="${new Date().toISOString().split('T')[0]}"
+                                   style="flex:1;min-width:130px;">
+                            <button onclick="quickPaymentDetail('${debtData._id}', ${debtData.remainingBalance})" 
+                                    class="btn-quick-pay-detail">
+                                💵 Record Payment
+                            </button>
+                        </div>
+                    </div>
+                ` : ''}
             </div>
             
             <h3 style="margin:20px 0 12px 0;font-size:1.1rem;">💰 Payment History</h3>
@@ -652,13 +762,41 @@ async function showDebtPayments(debtId) {
     }
 }
 
+// Quick payment from detail view
+async function quickPaymentDetail(debtId, remainingBalance) {
+    const amountInput = document.getElementById('detailPayAmount');
+    const dateInput = document.getElementById('detailPayDate');
+    const amount = parseFloat(amountInput.value);
+    const datePaid = dateInput.value;
+    
+    if (isNaN(amount) || amount <= 0) {
+        showToast('❌ Please enter a valid amount', 'error');
+        return;
+    }
+    
+    if (amount > remainingBalance) {
+        showToast(`❌ Amount exceeds remaining balance of ₱${remainingBalance.toFixed(2)}`, 'error');
+        return;
+    }
+    
+    const newStatus = amount >= remainingBalance ? 'Paid' : 'Partial';
+    
+    try {
+        await addPayment(debtId, amount, 'Quick payment', datePaid);
+        showToast(`✅ Payment recorded! Status: ${newStatus}`, 'success');
+        await showBorrowerDebts(currentBorrowerId);
+    } catch (error) {
+        showToast('❌ Error: ' + error.message, 'error');
+    }
+}
+
 function closeDebtDetail() {
     document.getElementById('debtDetailView').style.display = 'none';
     refreshDashboard();
 }
 
 // ========================================
-// POPULATE SELECTS
+// POPULATE SELECTS (Sorted Low to High)
 // ========================================
 
 async function populateSelects() {
@@ -670,7 +808,13 @@ async function populateSelects() {
         if (!select) return;
         const currentValue = select.value;
         select.innerHTML = '<option value="">Choose a borrower...</option>';
-        borrowers.forEach(borrower => {
+        
+        // Sort borrowers alphabetically
+        const sortedBorrowers = [...borrowers].sort((a, b) => 
+            a.name.localeCompare(b.name)
+        );
+        
+        sortedBorrowers.forEach(borrower => {
             const option = document.createElement('option');
             option.value = borrower._id;
             option.textContent = borrower.name;
@@ -679,6 +823,7 @@ async function populateSelects() {
         if (currentValue) select.value = currentValue;
     });
     
+    // When borrower is selected in payment form, load debts sorted low to high
     document.getElementById('paymentBorrower').addEventListener('change', async function() {
         const debtSelect = document.getElementById('paymentDebt');
         const borrowerId = this.value;
@@ -689,12 +834,22 @@ async function populateSelects() {
                 const response = await fetch(`${API_URL}/debts/borrower/${borrowerId}`);
                 const data = await response.json();
                 const debts = data.data || [];
+                
+                // Filter unpaid debts
                 const unpaidDebts = debts.filter(d => d.status !== 'Paid');
-                unpaidDebts.forEach(debt => {
+                
+                // Sort by remaining balance (low to high)
+                const sortedDebts = [...unpaidDebts].sort((a, b) => {
+                    const aRemaining = a.amount - (a.totalPaid || 0);
+                    const bRemaining = b.amount - (b.totalPaid || 0);
+                    return aRemaining - bRemaining;
+                });
+                
+                sortedDebts.forEach(debt => {
                     const option = document.createElement('option');
                     option.value = debt._id;
-                    const remaining = debt.remainingBalance || debt.amount;
-                    option.textContent = `${debt.reason} - ₱${remaining.toFixed(2)} remaining`;
+                    const remaining = debt.amount - (debt.totalPaid || 0);
+                    option.textContent = `₱${remaining.toFixed(2)} remaining - ${debt.reason}`;
                     debtSelect.appendChild(option);
                 });
             } catch (error) {

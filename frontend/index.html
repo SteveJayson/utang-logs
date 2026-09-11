@@ -197,7 +197,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Select Debt</label>
+                        <label>Select Debt <span style="font-size:0.75rem;color:var(--gray-400);font-weight:400;">(sorted low to high)</span></label>
                         <select id="paymentDebt" required>
                             <option value="">Choose a debt...</option>
                         </select>
@@ -208,9 +208,13 @@
                             <input type="number" id="paymentAmount" placeholder="0.00" required step="0.01">
                         </div>
                         <div class="form-group">
-                            <label>Notes</label>
-                            <input type="text" id="paymentNotes" placeholder="Reference (optional)">
+                            <label>Date Paid</label>
+                            <input type="date" id="paymentDate">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <input type="text" id="paymentNotes" placeholder="Reference (optional)">
                     </div>
                     <button type="submit" class="btn btn-primary">💾 Record Payment</button>
                 </form>

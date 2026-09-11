@@ -26,6 +26,7 @@ exports.createPayment = async (req, res) => {
             });
         }
         
+        // Create payment with date
         const payment = new Payment({
             debtId,
             amountPaid,
@@ -35,12 +36,17 @@ exports.createPayment = async (req, res) => {
         
         await payment.save();
         
-        // Update debt status
+        // Update debt status automatically
         await debt.updateStatus();
+        
+        // Get updated debt to return new status
+        const updatedDebt = await Debt.findById(debtId);
         
         res.status(201).json({
             success: true,
-            data: payment
+            data: payment,
+            debtStatus: updatedDebt.status,
+            message: `Payment recorded! Status: ${updatedDebt.status}`
         });
     } catch (error) {
         res.status(400).json({
