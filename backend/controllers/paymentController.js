@@ -26,7 +26,6 @@ exports.createPayment = async (req, res) => {
             });
         }
         
-        // Create payment with date
         const payment = new Payment({
             debtId,
             amountPaid,

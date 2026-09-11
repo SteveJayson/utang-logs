@@ -417,7 +417,7 @@ async function addPayment(debtId, amountPaid, notes, datePaid) {
         }
         
         const data = await response.json();
-        return data.data;
+        return data;
     } catch (error) {
         throw error;
     }
@@ -443,20 +443,40 @@ async function quickPayment(debtId, remainingBalance) {
         return;
     }
     
-    // Auto-detect status (backend will also verify)
     const newStatus = amount >= remainingBalance ? 'Paid' : 'Partial';
     
     try {
-        await addPayment(debtId, amount, 'Quick payment', datePaid);
-        
-        // Clear the input
+        const result = await addPayment(debtId, amount, 'Quick payment', datePaid);
         input.value = '';
-        
-        showToast(`✅ Payment recorded! Status: ${newStatus}`, 'success');
-        
-        // Refresh the debt list
+        showToast(`✅ Payment recorded! Status: ${result.debtStatus || newStatus}`, 'success');
         await showBorrowerDebts(currentBorrowerId);
-        
+    } catch (error) {
+        showToast('❌ Error: ' + error.message, 'error');
+    }
+}
+
+async function quickPaymentDetail(debtId, remainingBalance) {
+    const amountInput = document.getElementById('detailPayAmount');
+    const dateInput = document.getElementById('detailPayDate');
+    const amount = parseFloat(amountInput.value);
+    const datePaid = dateInput.value;
+    
+    if (isNaN(amount) || amount <= 0) {
+        showToast('❌ Please enter a valid amount', 'error');
+        return;
+    }
+    
+    if (amount > remainingBalance) {
+        showToast(`❌ Amount exceeds remaining balance of ₱${remainingBalance.toFixed(2)}`, 'error');
+        return;
+    }
+    
+    const newStatus = amount >= remainingBalance ? 'Paid' : 'Partial';
+    
+    try {
+        const result = await addPayment(debtId, amount, 'Quick payment', datePaid);
+        showToast(`✅ Payment recorded! Status: ${result.debtStatus || newStatus}`, 'success');
+        await showBorrowerDebts(currentBorrowerId);
     } catch (error) {
         showToast('❌ Error: ' + error.message, 'error');
     }
@@ -548,13 +568,10 @@ async function showBorrowerDebts(borrowerId) {
     const detailView = document.getElementById('debtDetailView');
     const content = document.getElementById('debtDetailContent');
     
-    // Sort debts from low to high (unpaid first, then by remaining balance)
+    // Sort debts low to high (unpaid first, then by remaining)
     const sortedDebts = [...debts].sort((a, b) => {
-        // Unpaid/Partial debts first
         if (a.status === 'Paid' && b.status !== 'Paid') return 1;
         if (a.status !== 'Paid' && b.status === 'Paid') return -1;
-        
-        // Then sort by remaining balance (low to high)
         const aRemaining = a.amount - (a.totalPaid || 0);
         const bRemaining = b.amount - (b.totalPaid || 0);
         return aRemaining - bRemaining;
@@ -669,7 +686,6 @@ async function showDebtPayments(debtId) {
         
         let paymentsHtml = '';
         if (debtData.payments && debtData.payments.length > 0) {
-            // Sort payments by date (newest first)
             const sortedPayments = [...debtData.payments].sort((a, b) => 
                 new Date(b.datePaid) - new Date(a.datePaid)
             );
@@ -762,46 +778,19 @@ async function showDebtPayments(debtId) {
     }
 }
 
-// Quick payment from detail view
-async function quickPaymentDetail(debtId, remainingBalance) {
-    const amountInput = document.getElementById('detailPayAmount');
-    const dateInput = document.getElementById('detailPayDate');
-    const amount = parseFloat(amountInput.value);
-    const datePaid = dateInput.value;
-    
-    if (isNaN(amount) || amount <= 0) {
-        showToast('❌ Please enter a valid amount', 'error');
-        return;
-    }
-    
-    if (amount > remainingBalance) {
-        showToast(`❌ Amount exceeds remaining balance of ₱${remainingBalance.toFixed(2)}`, 'error');
-        return;
-    }
-    
-    const newStatus = amount >= remainingBalance ? 'Paid' : 'Partial';
-    
-    try {
-        await addPayment(debtId, amount, 'Quick payment', datePaid);
-        showToast(`✅ Payment recorded! Status: ${newStatus}`, 'success');
-        await showBorrowerDebts(currentBorrowerId);
-    } catch (error) {
-        showToast('❌ Error: ' + error.message, 'error');
-    }
-}
-
 function closeDebtDetail() {
     document.getElementById('debtDetailView').style.display = 'none';
     refreshDashboard();
 }
 
 // ========================================
-// POPULATE SELECTS (Sorted Low to High)
+// POPULATE SELECTS (Auto-Select Lowest Debt)
 // ========================================
 
 async function populateSelects() {
     const borrowers = await fetchBorrowers();
     
+    // Populate borrower dropdowns
     const selects = ['debtBorrower', 'paymentBorrower'];
     selects.forEach(id => {
         const select = document.getElementById(id);
@@ -809,7 +798,6 @@ async function populateSelects() {
         const currentValue = select.value;
         select.innerHTML = '<option value="">Choose a borrower...</option>';
         
-        // Sort borrowers alphabetically
         const sortedBorrowers = [...borrowers].sort((a, b) => 
             a.name.localeCompare(b.name)
         );
@@ -823,38 +811,85 @@ async function populateSelects() {
         if (currentValue) select.value = currentValue;
     });
     
-    // When borrower is selected in payment form, load debts sorted low to high
-    document.getElementById('paymentBorrower').addEventListener('change', async function() {
+    // When borrower is selected in payment form, auto-load and AUTO-SELECT lowest debt
+    const paymentBorrower = document.getElementById('paymentBorrower');
+    
+    // Remove existing listener by cloning
+    const newPaymentBorrower = paymentBorrower.cloneNode(true);
+    paymentBorrower.parentNode.replaceChild(newPaymentBorrower, paymentBorrower);
+    
+    newPaymentBorrower.addEventListener('change', async function() {
         const debtSelect = document.getElementById('paymentDebt');
         const borrowerId = this.value;
+        const debtInfo = document.getElementById('debtInfo');
         
-        debtSelect.innerHTML = '<option value="">Choose a debt...</option>';
+        debtSelect.innerHTML = '<option value="">Loading debts...</option>';
+        if (debtInfo) debtInfo.style.display = 'none';
+        
         if (borrowerId) {
             try {
                 const response = await fetch(`${API_URL}/debts/borrower/${borrowerId}`);
                 const data = await response.json();
                 const debts = data.data || [];
                 
-                // Filter unpaid debts
+                // Filter out paid debts
                 const unpaidDebts = debts.filter(d => d.status !== 'Paid');
                 
-                // Sort by remaining balance (low to high)
+                // Sort by remaining balance (LOW TO HIGH)
                 const sortedDebts = [...unpaidDebts].sort((a, b) => {
                     const aRemaining = a.amount - (a.totalPaid || 0);
                     const bRemaining = b.amount - (b.totalPaid || 0);
                     return aRemaining - bRemaining;
                 });
                 
+                debtSelect.innerHTML = '';
+                
+                if (sortedDebts.length === 0) {
+                    debtSelect.innerHTML = '<option value="">✅ All debts are paid!</option>';
+                    return;
+                }
+                
                 sortedDebts.forEach(debt => {
                     const option = document.createElement('option');
                     option.value = debt._id;
                     const remaining = debt.amount - (debt.totalPaid || 0);
                     option.textContent = `₱${remaining.toFixed(2)} remaining - ${debt.reason}`;
+                    option.dataset.remaining = remaining;
                     debtSelect.appendChild(option);
                 });
+                
+                // ✅ AUTO-SELECT THE LOWEST DEBT
+                debtSelect.selectedIndex = 0;
+                debtSelect.classList.add('auto-selected');
+                
+                const lowestDebt = sortedDebts[0];
+                const lowestRemaining = lowestDebt.amount - (lowestDebt.totalPaid || 0);
+                
+                // Show info
+                if (debtInfo) {
+                    debtInfo.style.display = 'flex';
+                    debtInfo.innerHTML = `<span>💡 Auto-selected lowest debt: <strong>${lowestDebt.reason}</strong> (₱${lowestRemaining.toFixed(2)})</span>`;
+                }
+                
+                // Pre-fill amount with remaining balance
+                const amountInput = document.getElementById('paymentAmount');
+                if (amountInput) {
+                    amountInput.value = lowestRemaining.toFixed(2);
+                    amountInput.max = lowestRemaining.toFixed(2);
+                }
+                
+                // Remove auto-select indicator when user manually changes
+                debtSelect.addEventListener('change', function() {
+                    this.classList.remove('auto-selected');
+                    if (debtInfo) debtInfo.style.display = 'none';
+                });
+                
             } catch (error) {
                 console.error('Error loading debts:', error);
+                debtSelect.innerHTML = '<option value="">Error loading debts</option>';
             }
+        } else {
+            debtSelect.innerHTML = '<option value="">Choose a borrower first...</option>';
         }
     });
 }
@@ -1177,19 +1212,37 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     const debtId = document.getElementById('paymentDebt').value;
     const amountPaid = parseFloat(document.getElementById('paymentAmount').value);
     const notes = document.getElementById('paymentNotes').value.trim();
+    const datePaid = document.getElementById('paymentDate')?.value || '';
     
-    if (!debtId || !amountPaid) {
-        showToast('Please select a debt and enter the payment amount', 'error');
+    if (!debtId) {
+        showToast('Please select a borrower first', 'error');
+        return;
+    }
+    
+    if (!amountPaid || amountPaid <= 0) {
+        showToast('Please enter a valid payment amount', 'error');
         return;
     }
     
     try {
-        await addPayment(debtId, amountPaid, notes);
+        const result = await addPayment(debtId, amountPaid, notes, datePaid);
+        
+        showToast(`✅ Payment recorded! Status: ${result.debtStatus || 'Updated'}`, 'success');
+        
         document.getElementById('paymentForm').reset();
-        document.getElementById('paymentDebt').innerHTML = '<option value="">Choose a debt...</option>';
+        document.getElementById('paymentDebt').innerHTML = '<option value="">Choose a borrower first...</option>';
+        
+        const dateInput = document.getElementById('paymentDate');
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+        
+        const debtInfo = document.getElementById('debtInfo');
+        if (debtInfo) debtInfo.style.display = 'none';
+        
         await refreshDashboard();
-        showToast('✅ Payment recorded successfully!', 'success');
         showSection('dashboard');
+        
     } catch (error) {
         showToast('❌ Error: ' + error.message, 'error');
     }
@@ -1202,6 +1255,19 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
 async function initApp() {
     console.log('🚀 Utang Logs App Starting...');
     console.log('📡 API URL:', API_URL);
+    
+    // Set today's date for payment date field
+    const paymentDateInput = document.getElementById('paymentDate');
+    if (paymentDateInput) {
+        paymentDateInput.value = new Date().toISOString().split('T')[0];
+    }
+    
+    // Set today's date for debt date field
+    const debtDateInput = document.getElementById('debtDate');
+    if (debtDateInput) {
+        debtDateInput.value = new Date().toISOString().split('T')[0];
+    }
+    
     await refreshDashboard();
     initThemeControls();
     console.log('✅ App ready!');

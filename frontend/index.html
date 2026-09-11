@@ -197,10 +197,11 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Select Debt <span style="font-size:0.75rem;color:var(--gray-400);font-weight:400;">(sorted low to high)</span></label>
+                        <label>Select Debt <span style="font-size:0.75rem;color:var(--gray-400);font-weight:400;">(auto-selected: lowest remaining balance)</span></label>
                         <select id="paymentDebt" required>
-                            <option value="">Choose a debt...</option>
+                            <option value="">Choose a borrower first...</option>
                         </select>
+                        <div id="debtInfo" style="display:none;"></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
