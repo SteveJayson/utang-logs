@@ -1576,158 +1576,80 @@ header::after {
 }
 
 /* ========================================
-   AUTO-SELECTED DEBT INFO
+   AUTO-DEBT INFO PANEL
    ======================================== */
 
-#debtInfo {
-    padding: 8px 12px;
-    background: var(--success-light);
-    border-left: 3px solid var(--success);
+.auto-debt-info {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 2px solid var(--success);
     border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    animation: fadeIn 0.3s ease;
+}
+
+.auto-debt-header {
+    font-weight: 700;
+    font-size: 0.9rem;
     color: #065f46;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-top: 8px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-#debtInfo strong {
-    color: #065f46;
-}
-
-#paymentDebt.auto-selected {
-    border-color: var(--success) !important;
-    background: var(--success-light) !important;
-}
-
-/* Quick pay styles */
-.quick-pay-container {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-}
-
-.quick-pay-input {
-    width: 80px !important;
-    padding: 6px 8px !important;
-    font-size: 0.85rem !important;
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    background: white;
-    text-align: right;
-}
-
-.quick-pay-input:focus {
-    border-color: var(--success);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-}
-
-.quick-pay-date {
-    width: 120px !important;
-    padding: 6px 8px !important;
-    font-size: 0.8rem !important;
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    background: white;
-}
-
-.quick-pay-date:focus {
-    border-color: var(--success);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-}
-
-.btn-quick-pay {
-    padding: 6px 12px;
-    background: var(--success);
-    color: white;
-    border: none;
-    border-radius: var(--radius-sm);
+.auto-debt-details {
     font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    width: auto;
-    white-space: nowrap;
+    color: #065f46;
 }
 
-.btn-quick-pay:hover {
-    background: #059669;
-    transform: scale(1.05);
+.auto-debt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.btn-quick-pay-detail {
-    padding: 10px 20px;
+.auto-debt-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+.auto-debt-row.auto-debt-first {
+    background: white;
+    border: 2px solid var(--success);
+    font-weight: 600;
+}
+
+.auto-debt-row .auto-debt-remaining {
+    margin-left: auto;
+    font-weight: 700;
+    color: #065f46;
+}
+
+.auto-debt-badge {
     background: var(--success);
     color: white;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    width: auto;
-    white-space: nowrap;
-}
-
-.btn-quick-pay-detail:hover {
-    background: #059669;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.paid-label {
-    padding: 4px 12px;
-    background: var(--success-light);
-    color: #065f46;
-    border-radius: 12px;
-    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
     font-weight: 600;
     white-space: nowrap;
-}
-
-.debt-list-hint {
-    font-size: 0.8rem;
-    color: var(--gray-400);
-    font-style: italic;
-    margin-bottom: 12px;
-    padding: 6px 10px;
-    background: var(--gray-50);
-    border-radius: var(--radius-sm);
-    border-left: 3px solid var(--success);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .quick-pay-container {
-        flex-wrap: wrap;
-        width: 100%;
-        margin-top: 8px;
-    }
-    
-    .quick-pay-input {
-        flex: 1;
-        min-width: 70px;
-    }
-    
-    .quick-pay-date {
-        flex: 1;
-        min-width: 100px;
-    }
-    
-    .btn-quick-pay {
-        width: 100%;
-    }
 }
 
 @media (max-width: 480px) {
-    .quick-pay-container {
-        flex-direction: column;
-        gap: 6px;
+    .auto-debt-row {
+        flex-wrap: wrap;
+        font-size: 0.8rem;
     }
     
-    .quick-pay-input,
-    .quick-pay-date {
-        width: 100% !important;
+    .auto-debt-badge {
+        width: 100%;
+        text-align: center;
+        margin-top: 4px;
     }
 }

@@ -784,7 +784,7 @@ function closeDebtDetail() {
 }
 
 // ========================================
-// POPULATE SELECTS (Auto-Select Lowest Debt)
+// POPULATE SELECTS (Auto-select lowest debt)
 // ========================================
 
 async function populateSelects() {
@@ -811,20 +811,19 @@ async function populateSelects() {
         if (currentValue) select.value = currentValue;
     });
     
-    // When borrower is selected in payment form, auto-load and AUTO-SELECT lowest debt
+    // When borrower is selected in payment form, auto-load lowest debt
     const paymentBorrower = document.getElementById('paymentBorrower');
     
-    // Remove existing listener by cloning
+    // Remove existing listeners by cloning
     const newPaymentBorrower = paymentBorrower.cloneNode(true);
     paymentBorrower.parentNode.replaceChild(newPaymentBorrower, paymentBorrower);
     
     newPaymentBorrower.addEventListener('change', async function() {
-        const debtSelect = document.getElementById('paymentDebt');
         const borrowerId = this.value;
-        const debtInfo = document.getElementById('debtInfo');
+        const autoDebtInfo = document.getElementById('autoDebtInfo');
+        const autoDebtDetails = document.getElementById('autoDebtDetails');
         
-        debtSelect.innerHTML = '<option value="">Loading debts...</option>';
-        if (debtInfo) debtInfo.style.display = 'none';
+        if (autoDebtInfo) autoDebtInfo.style.display = 'none';
         
         if (borrowerId) {
             try {
@@ -835,61 +834,82 @@ async function populateSelects() {
                 // Filter out paid debts
                 const unpaidDebts = debts.filter(d => d.status !== 'Paid');
                 
-                // Sort by remaining balance (LOW TO HIGH)
+                if (unpaidDebts.length === 0) {
+                    if (autoDebtInfo) {
+                        autoDebtInfo.style.display = 'block';
+                        autoDebtDetails.innerHTML = `
+                            <div style="text-align:center;padding:10px;color:#065f46;">
+                                ✅ All debts are already paid!
+                            </div>
+                        `;
+                    }
+                    const amountInput = document.getElementById('paymentAmount');
+                    if (amountInput) {
+                        amountInput.value = '';
+                        amountInput.disabled = true;
+                    }
+                    return;
+                }
+                
+                // Sort LOW TO HIGH
                 const sortedDebts = [...unpaidDebts].sort((a, b) => {
                     const aRemaining = a.amount - (a.totalPaid || 0);
                     const bRemaining = b.amount - (b.totalPaid || 0);
                     return aRemaining - bRemaining;
                 });
                 
-                debtSelect.innerHTML = '';
+                // Show all debts in order with the lowest highlighted
+                let debtListHtml = '<div class="auto-debt-list">';
+                sortedDebts.forEach((debt, index) => {
+                    const remaining = debt.amount - (debt.totalPaid || 0);
+                    const isFirst = index === 0;
+                    debtListHtml += `
+                        <div class="auto-debt-row ${isFirst ? 'auto-debt-first' : ''}">
+                            ${isFirst ? '🎯 ' : `${index + 1}. `}
+                            <strong>${debt.reason}</strong>
+                            <span class="auto-debt-remaining">₱${remaining.toFixed(2)}</span>
+                            ${isFirst ? '<span class="auto-debt-badge">Will be paid first</span>' : ''}
+                        </div>
+                    `;
+                });
+                debtListHtml += '</div>';
                 
-                if (sortedDebts.length === 0) {
-                    debtSelect.innerHTML = '<option value="">✅ All debts are paid!</option>';
-                    return;
+                if (autoDebtInfo) {
+                    autoDebtInfo.style.display = 'block';
+                    autoDebtDetails.innerHTML = debtListHtml;
                 }
                 
-                sortedDebts.forEach(debt => {
-                    const option = document.createElement('option');
-                    option.value = debt._id;
-                    const remaining = debt.amount - (debt.totalPaid || 0);
-                    option.textContent = `₱${remaining.toFixed(2)} remaining - ${debt.reason}`;
-                    option.dataset.remaining = remaining;
-                    debtSelect.appendChild(option);
-                });
-                
-                // ✅ AUTO-SELECT THE LOWEST DEBT
-                debtSelect.selectedIndex = 0;
-                debtSelect.classList.add('auto-selected');
-                
+                // Store lowest debt ID and remaining on the form
                 const lowestDebt = sortedDebts[0];
                 const lowestRemaining = lowestDebt.amount - (lowestDebt.totalPaid || 0);
                 
-                // Show info
-                if (debtInfo) {
-                    debtInfo.style.display = 'flex';
-                    debtInfo.innerHTML = `<span>💡 Auto-selected lowest debt: <strong>${lowestDebt.reason}</strong> (₱${lowestRemaining.toFixed(2)})</span>`;
-                }
+                document.getElementById('paymentForm').dataset.lowestDebtId = lowestDebt._id;
+                document.getElementById('paymentForm').dataset.lowestDebtRemaining = lowestRemaining;
+                document.getElementById('paymentForm').dataset.allDebts = JSON.stringify(sortedDebts.map(d => ({
+                    id: d._id,
+                    remaining: d.amount - (d.totalPaid || 0),
+                    reason: d.reason
+                })));
                 
-                // Pre-fill amount with remaining balance
+                // Enable and pre-fill amount
                 const amountInput = document.getElementById('paymentAmount');
                 if (amountInput) {
+                    amountInput.disabled = false;
                     amountInput.value = lowestRemaining.toFixed(2);
                     amountInput.max = lowestRemaining.toFixed(2);
+                    amountInput.focus();
                 }
-                
-                // Remove auto-select indicator when user manually changes
-                debtSelect.addEventListener('change', function() {
-                    this.classList.remove('auto-selected');
-                    if (debtInfo) debtInfo.style.display = 'none';
-                });
                 
             } catch (error) {
                 console.error('Error loading debts:', error);
-                debtSelect.innerHTML = '<option value="">Error loading debts</option>';
+                showToast('❌ Error loading debts', 'error');
             }
         } else {
-            debtSelect.innerHTML = '<option value="">Choose a borrower first...</option>';
+            const amountInput = document.getElementById('paymentAmount');
+            if (amountInput) {
+                amountInput.value = '';
+                amountInput.disabled = false;
+            }
         }
     });
 }
@@ -1207,14 +1227,19 @@ document.getElementById('debtForm').addEventListener('submit', async (e) => {
     }
 });
 
+// ========================================
+// PAYMENT FORM - AUTO APPLY TO LOWEST DEBT
+// ========================================
+
 document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const debtId = document.getElementById('paymentDebt').value;
+    
+    const borrowerId = document.getElementById('paymentBorrower').value;
     const amountPaid = parseFloat(document.getElementById('paymentAmount').value);
     const notes = document.getElementById('paymentNotes').value.trim();
     const datePaid = document.getElementById('paymentDate')?.value || '';
     
-    if (!debtId) {
+    if (!borrowerId) {
         showToast('Please select a borrower first', 'error');
         return;
     }
@@ -1225,20 +1250,112 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     }
     
     try {
-        const result = await addPayment(debtId, amountPaid, notes, datePaid);
+        // Fetch current debts
+        const response = await fetch(`${API_URL}/debts/borrower/${borrowerId}`);
+        const data = await response.json();
+        const debts = data.data || [];
         
-        showToast(`✅ Payment recorded! Status: ${result.debtStatus || 'Updated'}`, 'success');
+        // Filter unpaid and sort LOW TO HIGH
+        const unpaidDebts = debts
+            .filter(d => d.status !== 'Paid')
+            .map(d => ({
+                id: d._id,
+                reason: d.reason,
+                remaining: d.amount - (d.totalPaid || 0)
+            }))
+            .sort((a, b) => a.remaining - b.remaining);
         
+        if (unpaidDebts.length === 0) {
+            showToast('✅ All debts are already paid!', 'info');
+            return;
+        }
+        
+        // Calculate total remaining
+        const totalRemaining = unpaidDebts.reduce((sum, d) => sum + d.remaining, 0);
+        
+        if (amountPaid > totalRemaining) {
+            showToast(`❌ Amount exceeds total remaining balance of ₱${totalRemaining.toFixed(2)}`, 'error');
+            return;
+        }
+        
+        // Apply payment across debts (lowest first)
+        let remainingAmount = amountPaid;
+        let appliedCount = 0;
+        let lastStatus = '';
+        const results = [];
+        
+        for (const debt of unpaidDebts) {
+            if (remainingAmount <= 0) break;
+            
+            const applyAmount = Math.min(remainingAmount, debt.remaining);
+            
+            try {
+                const payResponse = await fetch(`${API_URL}/payments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        debtId: debt.id,
+                        amountPaid: applyAmount,
+                        notes: notes || `Auto payment from lowest debt`,
+                        datePaid: datePaid || undefined
+                    })
+                });
+                
+                if (!payResponse.ok) {
+                    const err = await payResponse.json();
+                    throw new Error(err.message || 'Failed to record payment');
+                }
+                
+                const result = await payResponse.json();
+                lastStatus = result.debtStatus;
+                results.push({
+                    reason: debt.reason,
+                    amount: applyAmount,
+                    status: result.debtStatus
+                });
+                
+                remainingAmount -= applyAmount;
+                appliedCount++;
+                
+            } catch (err) {
+                console.error('Error applying payment:', err);
+                throw err;
+            }
+        }
+        
+        // Show success message
+        let message = `✅ Payment of ₱${amountPaid.toFixed(2)} recorded!`;
+        if (appliedCount === 1) {
+            message += ` Status: ${lastStatus}`;
+        } else {
+            message += ` Applied to ${appliedCount} debts!`;
+        }
+        
+        showToast(message, 'success');
+        
+        // Log details
+        console.log('📊 Payment applied:', results);
+        
+        // Reset form
         document.getElementById('paymentForm').reset();
-        document.getElementById('paymentDebt').innerHTML = '<option value="">Choose a borrower first...</option>';
+        document.getElementById('paymentForm').removeAttribute('data-lowest-debt-id');
+        document.getElementById('paymentForm').removeAttribute('data-lowest-debt-remaining');
+        document.getElementById('paymentForm').removeAttribute('data-all-debts');
         
+        const autoDebtInfo = document.getElementById('autoDebtInfo');
+        if (autoDebtInfo) autoDebtInfo.style.display = 'none';
+        
+        const amountInput = document.getElementById('paymentAmount');
+        if (amountInput) {
+            amountInput.disabled = false;
+            amountInput.value = '';
+        }
+        
+        // Reset date to today
         const dateInput = document.getElementById('paymentDate');
         if (dateInput) {
             dateInput.value = new Date().toISOString().split('T')[0];
         }
-        
-        const debtInfo = document.getElementById('debtInfo');
-        if (debtInfo) debtInfo.style.display = 'none';
         
         await refreshDashboard();
         showSection('dashboard');
