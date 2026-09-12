@@ -184,45 +184,45 @@
         </div>
 
         <!-- ============================================ -->
-<!-- SECTION: RECORD PAYMENT                      -->
-<!-- ============================================ -->
-<div id="sectionAddPayment" class="section">
-    <section class="form-section">
-        <h2>💵 Record Payment</h2>
-        <form id="paymentForm">
-            <div class="form-group">
-                <label>Select Borrower</label>
-                <select id="paymentBorrower" required>
-                    <option value="">Choose a borrower...</option>
-                </select>
-            </div>
-            
-            <!-- Auto-selected debt info (read-only display) -->
-            <div id="autoDebtInfo" class="auto-debt-info" style="display:none;">
-                <div class="auto-debt-header">
-                    <span>🎯 Auto-selected debt (lowest remaining)</span>
-                </div>
-                <div class="auto-debt-details" id="autoDebtDetails"></div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Amount Paid (₱)</label>
-                    <input type="number" id="paymentAmount" placeholder="0.00" required step="0.01">
-                </div>
-                <div class="form-group">
-                    <label>Date Paid</label>
-                    <input type="date" id="paymentDate">
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Notes</label>
-                <input type="text" id="paymentNotes" placeholder="Reference (optional)">
-            </div>
-            <button type="submit" class="btn btn-primary">💾 Record Payment</button>
-        </form>
-    </section>
-</div>
+        <!-- SECTION: RECORD PAYMENT (NO DEBT DROPDOWN)   -->
+        <!-- ============================================ -->
+        <div id="sectionAddPayment" class="section">
+            <section class="form-section">
+                <h2>💵 Record Payment</h2>
+                <form id="paymentForm">
+                    <div class="form-group">
+                        <label>Select Borrower</label>
+                        <select id="paymentBorrower" required>
+                            <option value="">Choose a borrower...</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Auto-selected debt info (read-only display) -->
+                    <div id="autoDebtInfo" class="auto-debt-info" style="display:none;">
+                        <div class="auto-debt-header">
+                            <span>🎯 Auto-selected debt (lowest remaining first)</span>
+                        </div>
+                        <div class="auto-debt-details" id="autoDebtDetails"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Amount Paid (₱)</label>
+                            <input type="number" id="paymentAmount" placeholder="0.00" required step="0.01" min="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Date Paid</label>
+                            <input type="date" id="paymentDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <input type="text" id="paymentNotes" placeholder="Reference (optional)">
+                    </div>
+                    <button type="submit" class="btn btn-primary">💾 Record Payment</button>
+                </form>
+            </section>
+        </div>
 
         <!-- ============================================ -->
         <!-- DEBT DETAIL VIEW (Hidden by default)         -->
