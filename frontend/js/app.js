@@ -424,7 +424,7 @@ async function addPayment(debtId, amountPaid, notes, datePaid) {
 }
 
 // ========================================
-// QUICK PAYMENT - NEW FEATURE
+// QUICK PAYMENT
 // ========================================
 
 async function quickPayment(debtId, remainingBalance) {
@@ -858,6 +858,11 @@ async function populateSelects() {
                     return aRemaining - bRemaining;
                 });
                 
+                // Calculate TOTAL remaining across all debts
+                const totalRemaining = sortedDebts.reduce((sum, debt) => {
+                    return sum + (debt.amount - (debt.totalPaid || 0));
+                }, 0);
+                
                 // Show all debts in order with the lowest highlighted
                 let debtListHtml = '<div class="auto-debt-list">';
                 sortedDebts.forEach((debt, index) => {
@@ -872,6 +877,11 @@ async function populateSelects() {
                         </div>
                     `;
                 });
+                debtListHtml += `
+                    <div class="auto-debt-total">
+                        💰 Total Remaining: <strong>₱${totalRemaining.toFixed(2)}</strong>
+                    </div>
+                `;
                 debtListHtml += '</div>';
                 
                 if (autoDebtInfo) {
@@ -879,24 +889,21 @@ async function populateSelects() {
                     autoDebtDetails.innerHTML = debtListHtml;
                 }
                 
-                // Store lowest debt ID and remaining on the form
+                // Store lowest debt info
                 const lowestDebt = sortedDebts[0];
                 const lowestRemaining = lowestDebt.amount - (lowestDebt.totalPaid || 0);
                 
                 document.getElementById('paymentForm').dataset.lowestDebtId = lowestDebt._id;
                 document.getElementById('paymentForm').dataset.lowestDebtRemaining = lowestRemaining;
-                document.getElementById('paymentForm').dataset.allDebts = JSON.stringify(sortedDebts.map(d => ({
-                    id: d._id,
-                    remaining: d.amount - (d.totalPaid || 0),
-                    reason: d.reason
-                })));
+                document.getElementById('paymentForm').dataset.totalRemaining = totalRemaining;
                 
-                // Enable and pre-fill amount
+                // ✅ FIXED: Set max to TOTAL remaining (not just lowest)
                 const amountInput = document.getElementById('paymentAmount');
                 if (amountInput) {
                     amountInput.disabled = false;
                     amountInput.value = lowestRemaining.toFixed(2);
-                    amountInput.max = lowestRemaining.toFixed(2);
+                    amountInput.max = totalRemaining.toFixed(2);
+                    amountInput.dataset.totalRemaining = totalRemaining;
                     amountInput.focus();
                 }
                 
@@ -909,10 +916,32 @@ async function populateSelects() {
             if (amountInput) {
                 amountInput.value = '';
                 amountInput.disabled = false;
+                amountInput.removeAttribute('max');
+                amountInput.removeAttribute('data-total-remaining');
             }
         }
     });
 }
+
+// ========================================
+// REAL-TIME AMOUNT VALIDATION
+// ========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.getElementById('paymentAmount');
+    if (amountInput) {
+        amountInput.addEventListener('input', function() {
+            const totalRemaining = parseFloat(this.dataset.totalRemaining) || Infinity;
+            const value = parseFloat(this.value) || 0;
+            
+            if (value > totalRemaining) {
+                this.setCustomValidity(`Maximum is ₱${totalRemaining.toFixed(2)}`);
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
 
 // ========================================
 // UTILITY FUNCTIONS
@@ -1333,14 +1362,10 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
         
         showToast(message, 'success');
         
-        // Log details
         console.log('📊 Payment applied:', results);
         
         // Reset form
         document.getElementById('paymentForm').reset();
-        document.getElementById('paymentForm').removeAttribute('data-lowest-debt-id');
-        document.getElementById('paymentForm').removeAttribute('data-lowest-debt-remaining');
-        document.getElementById('paymentForm').removeAttribute('data-all-debts');
         
         const autoDebtInfo = document.getElementById('autoDebtInfo');
         if (autoDebtInfo) autoDebtInfo.style.display = 'none';
@@ -1349,6 +1374,8 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
         if (amountInput) {
             amountInput.disabled = false;
             amountInput.value = '';
+            amountInput.removeAttribute('max');
+            amountInput.removeAttribute('data-total-remaining');
         }
         
         // Reset date to today
