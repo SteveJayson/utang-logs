@@ -1,10 +1,27 @@
 const Payment = require('../models/Payment');
 const Debt = require('../models/Debt');
 
-// Record a payment
+// ============================================
+// RECORD PAYMENT
+// ============================================
 exports.createPayment = async (req, res) => {
     try {
         const { debtId, amountPaid, datePaid, notes } = req.body;
+        
+        // Validate inputs
+        if (!debtId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Debt ID is required'
+            });
+        }
+        
+        if (!amountPaid || amountPaid <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Amount must be greater than 0'
+            });
+        }
         
         const debt = await Debt.findById(debtId);
         if (!debt) {
@@ -14,21 +31,26 @@ exports.createPayment = async (req, res) => {
             });
         }
         
-        // Check if payment exceeds remaining balance
+        // Calculate current remaining balance
         const existingPayments = await Payment.find({ debtId });
         const totalPaid = existingPayments.reduce((sum, p) => sum + p.amountPaid, 0);
-        const remaining = debt.amount - totalPaid;
+        const remaining = Math.round((debt.amount - totalPaid) * 100) / 100;
         
-        if (amountPaid > remaining) {
+        // Check if payment exceeds remaining balance (with 0.01 tolerance for floating point)
+        if (amountPaid > remaining + 0.01) {
             return res.status(400).json({
                 success: false,
                 message: `Payment exceeds remaining balance of ₱${remaining.toFixed(2)}`
             });
         }
         
+        // Cap the payment to the remaining balance to avoid floating point issues
+        const finalAmount = Math.round(Math.min(amountPaid, remaining) * 100) / 100;
+        
+        // Create payment
         const payment = new Payment({
             debtId,
-            amountPaid,
+            amountPaid: finalAmount,
             datePaid: datePaid || Date.now(),
             notes
         });
@@ -45,9 +67,12 @@ exports.createPayment = async (req, res) => {
             success: true,
             data: payment,
             debtStatus: updatedDebt.status,
+            remainingBalance: Math.round((updatedDebt.amount - (totalPaid + finalAmount)) * 100) / 100,
             message: `Payment recorded! Status: ${updatedDebt.status}`
         });
+        
     } catch (error) {
+        console.error('❌ Error in createPayment:', error);
         res.status(400).json({
             success: false,
             message: error.message
@@ -55,7 +80,9 @@ exports.createPayment = async (req, res) => {
     }
 };
 
-// Get all payments for a debt
+// ============================================
+// GET ALL PAYMENTS FOR A DEBT
+// ============================================
 exports.getPaymentsByDebt = async (req, res) => {
     try {
         const { debtId } = req.params;
@@ -68,6 +95,7 @@ exports.getPaymentsByDebt = async (req, res) => {
             data: payments
         });
     } catch (error) {
+        console.error('❌ Error in getPaymentsByDebt:', error);
         res.status(400).json({
             success: false,
             message: error.message
