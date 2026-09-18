@@ -832,7 +832,7 @@ async function populateSelects() {
                 const debts = data.data || [];
                 
                 // Filter out paid debts
-                const unpaidDebts = debts.filter(d => d.status !== 'Paid');
+                const unpaidDebts = debts.filter(d => d.status !== 'Paid' && (d.amount - (d.totalPaid || 0)) > 0.01);
                 
                 if (unpaidDebts.length === 0) {
                     if (autoDebtInfo) {
@@ -1270,6 +1270,8 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     const notes = document.getElementById('paymentNotes').value.trim();
     const datePaid = document.getElementById('paymentDate')?.value || '';
     
+    console.log('💵 Payment form submitted:', { borrowerId, amountPaid, datePaid });
+    
     if (!borrowerId) {
         showToast('Please select a borrower first', 'error');
         return;
@@ -1281,20 +1283,51 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
     }
     
     try {
-        // Fetch current debts
-        const response = await fetch(`${API_URL}/debts/borrower/${borrowerId}`);
-        const data = await response.json();
-        const debts = data.data || [];
+        // ✅ STEP 1: Get ALL current debts
+        const debtsResponse = await fetch(`${API_URL}/debts/borrower/${borrowerId}`);
+        const debtsData = await debtsResponse.json();
+        const allDebts = debtsData.data || [];
         
-        // Filter unpaid and sort LOW TO HIGH
-        const unpaidDebts = debts
-            .filter(d => d.status !== 'Paid')
-            .map(d => ({
-                id: d._id,
-                reason: d.reason,
-                remaining: Math.round((d.amount - (d.totalPaid || 0)) * 100) / 100
-            }))
+        console.log('📋 All debts fetched:', allDebts.length);
+        
+        // ✅ STEP 2: For each debt, get FULL details to calculate accurate remaining
+        const detailedDebts = await Promise.all(
+            allDebts.map(async (debt) => {
+                try {
+                    const detailResponse = await fetch(`${API_URL}/debts/${debt._id}`);
+                    const detailData = await detailResponse.json();
+                    
+                    if (detailData.success && detailData.data) {
+                        const d = detailData.data;
+                        const remaining = Math.round((d.amount - (d.totalPaid || 0)) * 100) / 100;
+                        
+                        return {
+                            id: d._id,
+                            reason: d.reason,
+                            amount: d.amount,
+                            totalPaid: d.totalPaid || 0,
+                            remaining: remaining,
+                            status: d.status
+                        };
+                    }
+                    return null;
+                } catch (err) {
+                    console.error('Error fetching debt details:', err);
+                    return null;
+                }
+            })
+        );
+        
+        // Filter out nulls, paid debts, and debts with no remaining
+        const unpaidDebts = detailedDebts
+            .filter(d => d !== null)
+            .filter(d => d.status !== 'Paid' && d.remaining > 0.01)
             .sort((a, b) => a.remaining - b.remaining);
+        
+        console.log('📊 Unpaid debts sorted low to high:', unpaidDebts.map(d => ({
+            reason: d.reason,
+            remaining: d.remaining
+        })));
         
         if (unpaidDebts.length === 0) {
             showToast('✅ All debts are already paid!', 'info');
@@ -1306,26 +1339,31 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
             unpaidDebts.reduce((sum, d) => sum + d.remaining, 0) * 100
         ) / 100;
         
+        console.log('💰 Total remaining:', totalRemaining);
+        
         if (amountPaid > totalRemaining + 0.01) {
             showToast(`❌ Amount exceeds total remaining balance of ₱${totalRemaining.toFixed(2)}`, 'error');
             return;
         }
         
-        // Apply payment across debts (lowest first)
+        // ✅ STEP 3: Apply payment sequentially
         let remainingAmount = Math.round(amountPaid * 100) / 100;
         let appliedCount = 0;
         let lastStatus = '';
         const results = [];
         let hasError = false;
+        let errorMessage = '';
         
         for (const debt of unpaidDebts) {
-            if (remainingAmount <= 0) break;
+            if (remainingAmount <= 0.001) break;
             
-            // Amount to apply (rounded to 2 decimals)
+            // Calculate amount to apply
             let applyAmount = Math.min(remainingAmount, debt.remaining);
             applyAmount = Math.round(applyAmount * 100) / 100;
             
             if (applyAmount <= 0) continue;
+            
+            console.log(`➡️ Applying ₱${applyAmount} to "${debt.reason}" (remaining: ₱${debt.remaining})`);
             
             try {
                 const payResponse = await fetch(`${API_URL}/payments`, {
@@ -1334,17 +1372,19 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
                     body: JSON.stringify({
                         debtId: debt.id,
                         amountPaid: applyAmount,
-                        notes: notes || `Auto payment from lowest debt`,
+                        notes: notes || 'Auto payment from lowest debt',
                         datePaid: datePaid || undefined
                     })
                 });
                 
                 if (!payResponse.ok) {
                     const err = await payResponse.json();
-                    console.error(`❌ Failed to pay debt "${debt.reason}":`, err.message);
-                    // If we already applied some payments, don't throw - just stop
+                    console.error(`❌ Backend rejected payment for "${debt.reason}":`, err.message);
+                    
+                    // If we already applied some payments, stop but don't fail
                     if (appliedCount > 0) {
                         hasError = true;
+                        errorMessage = err.message;
                         break;
                     }
                     throw new Error(err.message || 'Failed to record payment');
@@ -1361,28 +1401,34 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
                 remainingAmount = Math.round((remainingAmount - applyAmount) * 100) / 100;
                 appliedCount++;
                 
+                console.log(`✅ Applied. Remaining to apply: ₱${remainingAmount}`);
+                
             } catch (err) {
                 console.error('❌ Error applying payment:', err);
                 if (appliedCount > 0) {
                     hasError = true;
+                    errorMessage = err.message;
                     break;
                 }
                 throw err;
             }
         }
         
-        // Show success message
+        // ✅ STEP 4: Show result
         if (hasError) {
-            showToast(`⚠️ Partially applied ₱${amountPaid.toFixed(2)} (${appliedCount} debts)`, 'info');
+            showToast(`⚠️ Applied ₱${(amountPaid - remainingAmount).toFixed(2)} to ${appliedCount} debt(s). ${errorMessage}`, 'info');
+        } else if (appliedCount === 0) {
+            showToast('❌ No payment applied', 'error');
+            return;
         } else if (appliedCount === 1) {
             showToast(`✅ Payment of ₱${amountPaid.toFixed(2)} recorded! Status: ${lastStatus}`, 'success');
         } else {
             showToast(`✅ Payment of ₱${amountPaid.toFixed(2)} applied to ${appliedCount} debts!`, 'success');
         }
         
-        console.log('📊 Payment applied:', results);
+        console.log('📊 Payment summary:', results);
         
-        // Reset form
+        // ✅ STEP 5: Reset form
         document.getElementById('paymentForm').reset();
         
         const autoDebtInfo = document.getElementById('autoDebtInfo');
@@ -1396,7 +1442,7 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
             amountInput.removeAttribute('data-total-remaining');
         }
         
-        // Reset date to today
+        // Reset date
         const dateInput = document.getElementById('paymentDate');
         if (dateInput) {
             dateInput.value = new Date().toISOString().split('T')[0];
@@ -1406,6 +1452,7 @@ document.getElementById('paymentForm').addEventListener('submit', async (e) => {
         showSection('dashboard');
         
     } catch (error) {
+        console.error('❌ Fatal error in payment:', error);
         showToast('❌ Error: ' + error.message, 'error');
     }
 });
