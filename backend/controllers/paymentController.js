@@ -8,6 +8,8 @@ exports.createPayment = async (req, res) => {
     try {
         const { debtId, amountPaid, datePaid, notes } = req.body;
         
+        console.log('📥 Payment request received:', { debtId, amountPaid, datePaid });
+        
         // Validate inputs
         if (!debtId) {
             return res.status(400).json({
@@ -31,21 +33,32 @@ exports.createPayment = async (req, res) => {
             });
         }
         
-        // Calculate current remaining balance
+        // Calculate current remaining balance (with precision)
         const existingPayments = await Payment.find({ debtId });
         const totalPaid = existingPayments.reduce((sum, p) => sum + p.amountPaid, 0);
         const remaining = Math.round((debt.amount - totalPaid) * 100) / 100;
         
-        // Check if payment exceeds remaining balance (with 0.01 tolerance for floating point)
+        console.log('💰 Debt info:', {
+            reason: debt.reason,
+            amount: debt.amount,
+            totalPaid: totalPaid,
+            remaining: remaining,
+            requestedPayment: amountPaid
+        });
+        
+        // Check if payment exceeds remaining balance (with tolerance)
         if (amountPaid > remaining + 0.01) {
+            console.log('❌ Payment exceeds remaining:', amountPaid, '>', remaining);
             return res.status(400).json({
                 success: false,
                 message: `Payment exceeds remaining balance of ₱${remaining.toFixed(2)}`
             });
         }
         
-        // Cap the payment to the remaining balance to avoid floating point issues
+        // Cap the payment to the remaining balance
         const finalAmount = Math.round(Math.min(amountPaid, remaining) * 100) / 100;
+        
+        console.log('✅ Accepting payment:', finalAmount);
         
         // Create payment
         const payment = new Payment({
@@ -57,11 +70,13 @@ exports.createPayment = async (req, res) => {
         
         await payment.save();
         
-        // Update debt status automatically
+        // Update debt status
         await debt.updateStatus();
         
-        // Get updated debt to return new status
+        // Get updated debt
         const updatedDebt = await Debt.findById(debtId);
+        
+        console.log('✅ Payment saved. New status:', updatedDebt.status);
         
         res.status(201).json({
             success: true,
