@@ -285,3 +285,248 @@
 </body>
 </html>
 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>We've Moved! - Utang Logs</title>
+    
+    <!-- Auto-redirect after 5 seconds -->
+    <meta http-equiv="refresh" content="5; url=https://utanglogs.wuaze.com">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #1e293b;
+        }
+        
+        .redirect-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #4f46e5;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .message {
+            font-family: 'Kalam', cursive;
+            font-size: 1.15rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .new-url {
+            display: inline-block;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 15px 0 25px 0;
+            border: 2px solid #10b981;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            word-break: break-all;
+        }
+        
+        .new-url:hover {
+            background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .countdown {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        
+        .countdown strong {
+            color: #4f46e5;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .manual-link {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        
+        .manual-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+        
+        .footer-note {
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            border-radius: 10px;
+            width: 0%;
+            animation: fillBar 5s linear forwards;
+        }
+        
+        @keyframes fillBar {
+            from {
+                width: 0%;
+            }
+            to {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .redirect-card {
+                padding: 35px 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .icon {
+                font-size: 4rem;
+            }
+            
+            .new-url {
+                font-size: 0.95rem;
+                padding: 12px 18px;
+            }
+            
+            .message {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-card">
+        <span class="icon">🚀</span>
+        
+        <h1>We've Moved!</h1>
+        
+        <p class="message">
+            Ang Utang Logs ay lumipat na sa bago nitong tahanan!<br>
+            <em style="font-size: 0.95rem; color: #94a3b8;">(Utang Logs has moved to a new home!)</em>
+        </p>
+        
+        <div style="margin: 20px 0;">
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 8px;">New Website:</p>
+            <a href="https://utanglogs.wuaze.com" class="new-url">
+                🌐 utanglogs.wuaze.com
+            </a>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <p class="countdown">
+            Redirecting in <strong id="counter">5</strong> seconds...
+        </p>
+        
+        <a href="https://utanglogs.wuaze.com" class="manual-link">
+            Go Now →
+        </a>
+        
+        <p class="footer-note">
+            📌 Please update your bookmarks!
+        </p>
+    </div>
+    
+    <script>
+        // Countdown timer
+        let seconds = 5;
+        const counter = document.getElementById('counter');
+        
+        const interval = setInterval(() => {
+            seconds--;
+            if (counter) counter.textContent = seconds;
+            
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = 'https://utanglogs.wuaze.com';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
